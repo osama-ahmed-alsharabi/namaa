@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "334784489827",
+    "project_id": "namaa-62800",
+    "storage_bucket": "namaa-62800.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:334784489827:android:ae1dc6e3441a5dad268b56",
+        "android_client_info": {
+          "package_name": "com.example.namaa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCT5cwK-TXWkPrquWbpbAN3vd0A4hQyBio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

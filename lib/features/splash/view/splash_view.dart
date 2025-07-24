@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:namaa/cores/assets.dart';
 import 'package:namaa/features/auth/login/views/login_view.dart';
+import 'package:namaa/features/onboarding/onboarding_view.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -21,7 +22,7 @@ class _SplashViewState extends State<SplashView> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginView()),
+          MaterialPageRoute(builder: (context) => OnboardingView()),
         );
       }
     });

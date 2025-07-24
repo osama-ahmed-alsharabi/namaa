@@ -166,7 +166,7 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
           SizedBox(height: 15),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: CustomButtonWidget(text: S.of(context).register),
+            child: CustomButtonWidget(text: S.of(context).create_an_account),
           ),
           SizedBox(height: 48),
         ],

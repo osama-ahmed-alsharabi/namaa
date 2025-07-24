@@ -5,5 +5,9 @@ class Assets {
   /// Assets for imagesLogo
   /// assets/images/logo.png
   static const String imagesLogo = "assets/images/logo.png";
+
+  /// Assets for imagesNamaa
+  /// assets/images/namaa.png
+  static const String imagesNamaa = "assets/images/namaa.png";
 }
 
