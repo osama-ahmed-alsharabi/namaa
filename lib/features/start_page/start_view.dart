@@ -19,10 +19,10 @@ class StartView extends StatelessWidget {
               child: Text(
                 "جاهز تخطط لهدفك الجاي مع درهم ؟"
                 " يلا نبدأ سوا !",
-                textAlign: TextAlign.center,
-                style: TextStyle( 
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30 , color: AppColors.primaryColor, ),
+                  textAlign: TextAlign.center,
+                  style: TextStyle( 
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30 , color: AppColors.primaryColor, ),
               ),
             ),
             SizedBox(height: 10,),
