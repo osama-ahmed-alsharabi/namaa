@@ -8,16 +8,18 @@ class TextFieldFormWidget extends StatelessWidget {
   final String? suffixText;
   final bool? obscureText;
   final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
   const TextFieldFormWidget({
     super.key,
     this.controller,
     required this.hint,
-    this.suffix, this.suffixText,  this.obscureText, this.keyboardType,
+    this.suffix, this.suffixText,  this.obscureText, this.keyboardType, this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      validator: validator,
       keyboardType: keyboardType,
       controller: controller,
       obscureText: obscureText ?? false,

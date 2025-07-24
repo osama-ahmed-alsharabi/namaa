@@ -174,6 +174,76 @@ class S {
   String get gender {
     return Intl.message('الجنس', name: 'gender', desc: '', args: []);
   }
+
+  /// `تأكيد رقم الهاتف`
+  String get verify_phone {
+    return Intl.message(
+      'تأكيد رقم الهاتف',
+      name: 'verify_phone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `ادخل رمز التحقق`
+  String get enter_verification_code {
+    return Intl.message(
+      'ادخل رمز التحقق',
+      name: 'enter_verification_code',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `تأكيد`
+  String get verify {
+    return Intl.message('تأكيد', name: 'verify', desc: '', args: []);
+  }
+
+  /// `تم ارسال الرمز الى `
+  String get sent_to {
+    return Intl.message(
+      'تم ارسال الرمز الى ',
+      name: 'sent_to',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `اعادة ارسال الرمز`
+  String get resend_code {
+    return Intl.message(
+      'اعادة ارسال الرمز',
+      name: 'resend_code',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `التالي`
+  String get next {
+    return Intl.message('التالي', name: 'next', desc: '', args: []);
+  }
+
+  /// `رمز التحقق`
+  String get verification_code {
+    return Intl.message(
+      'رمز التحقق',
+      name: 'verification_code',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `ادخل رمز التحقق`
+  String get enter_your_code {
+    return Intl.message(
+      'ادخل رمز التحقق',
+      name: 'enter_your_code',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

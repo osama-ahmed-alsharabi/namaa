@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:namaa/cores/assets.dart';
-import 'package:namaa/features/auth/login/views/login_view.dart';
 import 'package:namaa/features/onboarding/onboarding_view.dart';
 
 class SplashView extends StatefulWidget {
@@ -31,6 +30,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:  Color(0xffFFFEF9),
       body: Center(child: Image.asset(Assets.imagesLogo)),
     );
   }

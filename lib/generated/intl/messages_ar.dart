@@ -30,6 +30,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "create_an_account": MessageLookupByLibrary.simpleMessage("إنشاء حساب "),
     "email": MessageLookupByLibrary.simpleMessage("البريد الالكتروني"),
     "english": MessageLookupByLibrary.simpleMessage("الانجليزية"),
+    "enter_verification_code": MessageLookupByLibrary.simpleMessage(
+      "ادخل رمز التحقق",
+    ),
+    "enter_your_code": MessageLookupByLibrary.simpleMessage("ادخل رمز التحقق"),
     "forget_password": MessageLookupByLibrary.simpleMessage(
       "نسيت كلمة المرور؟",
     ),
@@ -41,10 +45,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "new_password_confirmation": MessageLookupByLibrary.simpleMessage(
       "تأكيد كلمة المرور الجديدة",
     ),
+    "next": MessageLookupByLibrary.simpleMessage("التالي"),
     "password": MessageLookupByLibrary.simpleMessage("كلمة المرور"),
     "phone_number": MessageLookupByLibrary.simpleMessage("رقم الهاتف"),
     "register": MessageLookupByLibrary.simpleMessage("تسجيل"),
+    "resend_code": MessageLookupByLibrary.simpleMessage("اعادة ارسال الرمز"),
+    "sent_to": MessageLookupByLibrary.simpleMessage("تم ارسال الرمز الى "),
     "username": MessageLookupByLibrary.simpleMessage("اسم المستخدم"),
+    "verification_code": MessageLookupByLibrary.simpleMessage("رمز التحقق"),
+    "verify": MessageLookupByLibrary.simpleMessage("تأكيد"),
+    "verify_phone": MessageLookupByLibrary.simpleMessage("تأكيد رقم الهاتف"),
     "you_dont_have_an_account": MessageLookupByLibrary.simpleMessage(
       "ليس لديك حساب مسجل ؟",
     ),

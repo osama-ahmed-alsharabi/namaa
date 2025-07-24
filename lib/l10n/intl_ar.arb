@@ -16,5 +16,13 @@
     "create_an_account":"إنشاء حساب ",
     "name":" الاسم",
     "age":"العمر",
-    "gender":"الجنس"
+    "gender":"الجنس",
+    "verify_phone":"تأكيد رقم الهاتف",
+    "enter_verification_code":"ادخل رمز التحقق",
+    "verify":"تأكيد",
+    "sent_to":"تم ارسال الرمز الى ",
+    "resend_code":"اعادة ارسال الرمز",
+    "next":"التالي",
+    "verification_code":"رمز التحقق",
+    "enter_your_code":"ادخل رمز التحقق"
 }
