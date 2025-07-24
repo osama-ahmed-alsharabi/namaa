@@ -150,14 +150,29 @@ class S {
     );
   }
 
-  /// `انشاء حساب`
+  /// `إنشاء حساب `
   String get create_an_account {
     return Intl.message(
-      'انشاء حساب',
+      'إنشاء حساب ',
       name: 'create_an_account',
       desc: '',
       args: [],
     );
+  }
+
+  /// ` الاسم`
+  String get name {
+    return Intl.message(' الاسم', name: 'name', desc: '', args: []);
+  }
+
+  /// `العمر`
+  String get age {
+    return Intl.message('العمر', name: 'age', desc: '', args: []);
+  }
+
+  /// `الجنس`
+  String get gender {
+    return Intl.message('الجنس', name: 'gender', desc: '', args: []);
   }
 }
 

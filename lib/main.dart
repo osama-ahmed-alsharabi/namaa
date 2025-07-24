@@ -22,6 +22,9 @@ class Namaa extends StatelessWidget {
         scaffoldBackgroundColor: Color(0xffFFFEF9),
         appBarTheme: AppBarTheme(
           backgroundColor:  Color(0xffFFFEF9),
+          iconTheme: IconThemeData(
+            color: Colors.black
+          )
         )
       ),
       debugShowCheckedModeBanner: false,

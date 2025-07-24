@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/cores/widgets/custom_button_widget.dart';
 import 'package:namaa/cores/widgets/text_field_form_widget.dart';
+import 'package:namaa/features/auth/singup/views/sighup_view.dart';
 import 'package:namaa/generated/l10n.dart';
 
 class LoginFormWidget extends StatefulWidget {
@@ -79,9 +80,14 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                 S.of(context).you_dont_have_an_account,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
               ),
-              Text(
-                S.of(context).create_an_account,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400 , color: Colors.blue),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>SingupView()));
+                },
+                child: Text(
+                  S.of(context).create_an_account,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400 , color: Colors.blue),
+                ),
               ),
             ],
           ),

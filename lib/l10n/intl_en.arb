@@ -13,5 +13,8 @@
     "new_password":"كلمة المرور الجديدة",
     "new_password_confirmation":"تأكيد كلمة المرور الجديدة",
     "you_dont_have_an_account":"ليس لديك حساب مسجل ؟",
-    "create_an_account":"انشاء حساب"
+    "create_an_account":"إنشاء حساب ",
+    "name":" الاسم",
+    "age":"العمر",
+    "gender":"الجنس"
 }

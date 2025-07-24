@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:namaa/cores/assets.dart';
 import 'package:namaa/features/auth/login/views/login_view.dart';
 
