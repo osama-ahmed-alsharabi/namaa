@@ -54,6 +54,111 @@ class S {
   static S? maybeOf(BuildContext context) {
     return Localizations.of<S>(context, S);
   }
+
+  /// `تسجيل الدخول `
+  String get login {
+    return Intl.message('تسجيل الدخول ', name: 'login', desc: '', args: []);
+  }
+
+  /// `اسم المستخدم`
+  String get username {
+    return Intl.message('اسم المستخدم', name: 'username', desc: '', args: []);
+  }
+
+  /// `كلمة المرور`
+  String get password {
+    return Intl.message('كلمة المرور', name: 'password', desc: '', args: []);
+  }
+
+  /// `اللغة`
+  String get language {
+    return Intl.message('اللغة', name: 'language', desc: '', args: []);
+  }
+
+  /// `الانجليزية`
+  String get english {
+    return Intl.message('الانجليزية', name: 'english', desc: '', args: []);
+  }
+
+  /// `العربية`
+  String get arabic {
+    return Intl.message('العربية', name: 'arabic', desc: '', args: []);
+  }
+
+  /// `رقم الهاتف`
+  String get phone_number {
+    return Intl.message('رقم الهاتف', name: 'phone_number', desc: '', args: []);
+  }
+
+  /// `البريد الالكتروني`
+  String get email {
+    return Intl.message('البريد الالكتروني', name: 'email', desc: '', args: []);
+  }
+
+  /// `تأكيد كلمة المرور`
+  String get confirm_password {
+    return Intl.message(
+      'تأكيد كلمة المرور',
+      name: 'confirm_password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `تسجيل`
+  String get register {
+    return Intl.message('تسجيل', name: 'register', desc: '', args: []);
+  }
+
+  /// `نسيت كلمة المرور؟`
+  String get forget_password {
+    return Intl.message(
+      'نسيت كلمة المرور؟',
+      name: 'forget_password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `كلمة المرور الجديدة`
+  String get new_password {
+    return Intl.message(
+      'كلمة المرور الجديدة',
+      name: 'new_password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `تأكيد كلمة المرور الجديدة`
+  String get new_password_confirmation {
+    return Intl.message(
+      'تأكيد كلمة المرور الجديدة',
+      name: 'new_password_confirmation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `ليس لديك حساب مسجل ؟`
+  String get you_dont_have_an_account {
+    return Intl.message(
+      'ليس لديك حساب مسجل ؟',
+      name: 'you_dont_have_an_account',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `انشاء حساب`
+  String get create_an_account {
+    return Intl.message(
+      'انشاء حساب',
+      name: 'create_an_account',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

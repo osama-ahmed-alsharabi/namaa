@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/features/splash/view/splash_view.dart';
 import 'package:namaa/generated/l10n.dart';
 
@@ -13,6 +14,18 @@ class Namaa extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        useMaterial3: false,
+        iconTheme: IconThemeData(
+          color: AppColors.primaryColor
+        ),
+        scaffoldBackgroundColor: Color(0xffFFFEF9),
+        appBarTheme: AppBarTheme(
+          backgroundColor:  Color(0xffFFFEF9),
+        )
+      ),
+      debugShowCheckedModeBanner: false,
+      locale: Locale("ar"),
       localizationsDelegates: [
         S.delegate,
         GlobalMaterialLocalizations.delegate,

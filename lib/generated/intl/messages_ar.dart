@@ -21,5 +21,29 @@ class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'ar';
 
   final messages = _notInlinedMessages(_notInlinedMessages);
-  static Map<String, Function> _notInlinedMessages(_) => <String, Function>{};
+  static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "arabic": MessageLookupByLibrary.simpleMessage("العربية"),
+    "confirm_password": MessageLookupByLibrary.simpleMessage(
+      "تأكيد كلمة المرور",
+    ),
+    "create_an_account": MessageLookupByLibrary.simpleMessage("انشاء حساب"),
+    "email": MessageLookupByLibrary.simpleMessage("البريد الالكتروني"),
+    "english": MessageLookupByLibrary.simpleMessage("الانجليزية"),
+    "forget_password": MessageLookupByLibrary.simpleMessage(
+      "نسيت كلمة المرور؟",
+    ),
+    "language": MessageLookupByLibrary.simpleMessage("اللغة"),
+    "login": MessageLookupByLibrary.simpleMessage("تسجيل الدخول "),
+    "new_password": MessageLookupByLibrary.simpleMessage("كلمة المرور الجديدة"),
+    "new_password_confirmation": MessageLookupByLibrary.simpleMessage(
+      "تأكيد كلمة المرور الجديدة",
+    ),
+    "password": MessageLookupByLibrary.simpleMessage("كلمة المرور"),
+    "phone_number": MessageLookupByLibrary.simpleMessage("رقم الهاتف"),
+    "register": MessageLookupByLibrary.simpleMessage("تسجيل"),
+    "username": MessageLookupByLibrary.simpleMessage("اسم المستخدم"),
+    "you_dont_have_an_account": MessageLookupByLibrary.simpleMessage(
+      "ليس لديك حساب مسجل ؟",
+    ),
+  };
 }

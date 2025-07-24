@@ -1,1 +1,17 @@
-{}
+{
+    "login" : "تسجيل الدخول ",
+    "username":"اسم المستخدم",
+    "password":"كلمة المرور",
+    "language":"اللغة",
+    "english":"الانجليزية",
+    "arabic":"العربية",
+    "phone_number":"رقم الهاتف",
+    "email":"البريد الالكتروني",
+    "confirm_password":"تأكيد كلمة المرور",
+    "register":"تسجيل",
+    "forget_password":"نسيت كلمة المرور؟",
+    "new_password":"كلمة المرور الجديدة",
+    "new_password_confirmation":"تأكيد كلمة المرور الجديدة",
+    "you_dont_have_an_account":"ليس لديك حساب مسجل ؟",
+    "create_an_account":"انشاء حساب"
+}
