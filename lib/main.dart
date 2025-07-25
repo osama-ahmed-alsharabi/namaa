@@ -1,9 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
+import 'package:namaa/features/auth/singup/view_model/cubit/signup_cubit.dart';
 import 'package:namaa/features/splash/view/splash_view.dart';
 import 'package:namaa/features/start_page/start_view.dart';
+import 'package:namaa/features/your_monthly_budget/view_model/cubit/monthly_budget_cubit.dart';
 import 'package:namaa/firebase_options.dart';
 import 'package:namaa/generated/l10n.dart';
 
@@ -18,24 +21,30 @@ class Namaa extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        iconTheme: IconThemeData(color: AppColors.primaryColor),
-        appBarTheme: AppBarTheme(
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
-        ),
-      ),
-      debugShowCheckedModeBanner: false,
-      locale: Locale("ar"),
-      localizationsDelegates: [
-        S.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => SignupCubit()),
+        BlocProvider(create: (context) => BudgetCubit()),
       ],
-      supportedLocales: S.delegate.supportedLocales,
-      home: StartView(),
+      child: MaterialApp(
+        theme: ThemeData(
+          iconTheme: IconThemeData(color: AppColors.primaryColor),
+          appBarTheme: AppBarTheme(
+            elevation: 0,
+            iconTheme: IconThemeData(color: Colors.black),
+          ),
+        ),
+        debugShowCheckedModeBanner: false,
+        locale: Locale("ar"),
+        localizationsDelegates: [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: S.delegate.supportedLocales,
+        home: SplashView(),
+      ),
     );
   }
 }

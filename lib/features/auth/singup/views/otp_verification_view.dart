@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:namaa/cores/widgets/custom_button_widget.dart';
 import 'package:namaa/features/auth/singup/view_model/cubit/signup_cubit.dart';
+import 'package:namaa/features/onboarding/onboarding_view.dart';
+import 'package:namaa/features/start_page/start_view.dart';
 import 'package:namaa/generated/l10n.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -64,15 +68,24 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             const SizedBox(height: 32),
             CustomButtonWidget(
               text: S.of(context).verify,
-              onPressed: () {
-                context.read<SignupCubit>().verifyOtp(
-                  verificationId: widget.verificationId,
-                  smsCode: _otpController.text,
-                  phoneNumber: widget.phoneNumber,
-                  name: widget.name,
-                  age: widget.age,
-                  gender: widget.gender,
-                  password: widget.password,
+              onPressed: () async {
+                try {
+                  await context.read<SignupCubit>().verifyOtp(
+                    verificationId: widget.verificationId,
+                    smsCode: _otpController.text,
+                    phoneNumber: widget.phoneNumber,
+                    name: widget.name,
+                    age: widget.age,
+                    gender: widget.gender,
+                    password: widget.password,
+                  );
+                  
+                } catch (e) {
+                  log(e.toString());
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StartView()),
                 );
               },
             ),

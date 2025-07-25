@@ -46,9 +46,9 @@ class SignupCubit extends Cubit<SignupState> {
 
     try {
       // Format phone number (assuming Saudi numbers)
-      final formattedPhone = phoneNumber.startsWith('+967') 
+      final formattedPhone = phoneNumber.startsWith('+966') 
           ? phoneNumber 
-          : '+967${phoneNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
+          : '+966${phoneNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
 
       // Send verification code
       await _auth.verifyPhoneNumber(
