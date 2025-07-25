@@ -11,6 +11,7 @@ class OnboardingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffFFFEF9),
       body: SafeArea(
         child: Column(
           children: [
@@ -26,7 +27,9 @@ class OnboardingView extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => LoginView()),
                       );
                     },
-                    child: CustomButtonWidget(text: S.of(context).login),
+                    child: CustomButtonWidget(
+                      height: 50,
+                      text: S.of(context).login),
                   ),
                   SizedBox(height: 15),
                   GestureDetector(
@@ -37,6 +40,7 @@ class OnboardingView extends StatelessWidget {
                       );
                     },
                     child: CustomButtonWidget(
+                      height: 50,
                       text: S.of(context).create_an_account,
                     ),
                   ),
