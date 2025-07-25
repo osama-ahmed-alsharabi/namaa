@@ -1,11 +1,15 @@
-
 import 'package:flutter/material.dart';
+import 'package:namaa/cores/utils/app_colors.dart';
 
 class CustomButtonWidget extends StatelessWidget {
   final String text;
   final void Function()? onPressed;
+  final double? height;
   const CustomButtonWidget({
-    super.key, required this.text, this.onPressed,
+    super.key,
+    required this.text,
+    this.onPressed,
+    this.height,
   });
 
   @override
@@ -13,9 +17,9 @@ class CustomButtonWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        height: 90,
+        height: height ?? 90,
         decoration: BoxDecoration(
-          color: Color.fromARGB( 200,130, 118 ,49),
+          color: AppColors.brownColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(

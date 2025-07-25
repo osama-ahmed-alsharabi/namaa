@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/cores/widgets/custom_button_widget.dart';
 import 'package:namaa/cores/widgets/text_field_form_widget.dart';
+import 'package:namaa/features/your_monthly_budget/your_monthly_budget_view.dart';
 
 class GoalView extends StatelessWidget {
   const GoalView({super.key});
@@ -73,7 +74,11 @@ class GoalView extends StatelessWidget {
               SizedBox(height: 60),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 80.0),
-                child: CustomButtonWidget(text: "التالي"),
+                child: CustomButtonWidget(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>YourMonthlyBudgetView()));
+                  },
+                  text: "التالي"),
               ),
               SizedBox(height: 48,)
             ],
