@@ -13,7 +13,11 @@ class TextFieldFormWidget extends StatelessWidget {
     super.key,
     this.controller,
     required this.hint,
-    this.suffix, this.suffixText,  this.obscureText, this.keyboardType, this.validator,
+    this.suffix,
+    this.suffixText,
+    this.obscureText,
+    this.keyboardType,
+    this.validator,
   });
 
   @override
@@ -30,6 +34,7 @@ class TextFieldFormWidget extends StatelessWidget {
         hint: Text(hint),
         enabledBorder: border(),
         errorBorder: border(color: Colors.red),
+        focusedErrorBorder: border(color: Colors.red),
         focusedBorder: border(),
       ),
     );
@@ -38,7 +43,7 @@ class TextFieldFormWidget extends StatelessWidget {
   OutlineInputBorder border({Color? color}) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+      borderSide: BorderSide(color: color ?? AppColors.primaryColor, width: 2),
     );
   }
 }

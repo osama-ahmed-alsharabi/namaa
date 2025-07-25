@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/cores/widgets/custom_button_widget.dart';
 import 'package:namaa/cores/widgets/text_field_form_widget.dart';
 import 'package:namaa/features/auth/singup/view_model/cubit/signup_cubit.dart';
 import 'package:namaa/features/auth/singup/views/otp_verification_view.dart';
+import 'package:namaa/features/start_page/start_view.dart';
 import 'package:namaa/generated/l10n.dart';
 
 class SingupFormWidget extends StatefulWidget {
@@ -24,6 +26,7 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -38,16 +41,18 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SignupCubit, SignupState>(
+    return BlocConsumer<SignupCubit, SignupState>(
       listener: (context, state) {
         state.whenOrNull(
+          loading: () => setState(() => _isLoading = true),
           error: (message) {
+            setState(() => _isLoading = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(message)),
             );
           },
           codeSent: (verificationId, phoneNumber, name, age, gender, password) {
-            // Navigate to OTP screen
+            setState(() => _isLoading = false);
             _navigateToOtpScreen(
               context,
               verificationId,
@@ -59,208 +64,237 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
             );
           },
           success: () {
-            // Navigate to home screen or show success message
-            Navigator.of(context).pushReplacementNamed('/home');
+            setState(() => _isLoading = false);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const StartView()),
+            );
           },
         );
       },
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              textAlign: TextAlign.center,
-              S.of(context).create_an_account,
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
-            ),
-            SizedBox(height: 30),
-      
-            Text(
-              S.of(context).name,
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400),
-            ),
-            SizedBox(height: 5),
-      
-            TextFieldFormWidget(
-              controller: _nameController,
-              hint: S.of(context).name,
-              validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-            ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
+      builder: (context, state) {
+        return PopScope(
+          canPop: !_isLoading,
+          child: ModalProgressHUD(
+            inAsyncCall: _isLoading,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Form(
+                  key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        S.of(context).age,
-                        style: TextStyle(
+                        textAlign: TextAlign.center,
+                        S.of(context).create_an_account,
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                        
+                      Text(
+                        S.of(context).name,
+                        style: const TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      SizedBox(height: 5),
-      
+                      const SizedBox(height: 5),
+                        
                       TextFieldFormWidget(
-                        controller: _ageController,
-                        hint: S.of(context).age,
-                        keyboardType: TextInputType.number,
-                        validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                        controller: _nameController,
+                        hint: S.of(context).name,
+                        validator: (value) => value?.isEmpty ?? true ? 'مطلوب' : null,
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 5),
-      
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  S.of(context).age,
+                                  style: const TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                        
+                                TextFieldFormWidget(
+                                  controller: _ageController,
+                                  hint: S.of(context).age,
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) =>
+                                      value?.isEmpty ?? true ? 'مطلوب' : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 5),
+                        
+                                Text(
+                                  S.of(context).gender,
+                                  style: const TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                TextFieldFormWidget(
+                                  controller: _genderController,
+                                  hint: S.of(context).gender,
+                                  validator: (value) =>
+                                      value?.isEmpty ?? true ? 'مطلوب' : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
                       Text(
-                        S.of(context).gender,
-                        style: TextStyle(
+                        S.of(context).phone_number,
+                        style: const TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
+                      const SizedBox(height: 5),
                       TextFieldFormWidget(
-                        controller: _genderController,
-                        hint: S.of(context).gender,
-                        validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+                        controller: _phoneController,
+                        suffixText: "+966",
+                        keyboardType: TextInputType.phone,
+                        hint: S.of(context).phone_number,
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) return 'مطلوب';
+                          if (value!.length < 9) return 'رقم الجوال غير صالح';
+                          return null;
+                        },
                       ),
+                      const SizedBox(height: 15),
+                        
+                      Text(
+                        S.of(context).password,
+                        style: const TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFieldFormWidget(
+                        controller: _passwordController,
+                        obscureText: visibility,
+                        suffix: GestureDetector(
+                          onTap: () {
+                            setState(() => visibility = !visibility);
+                          },
+                          child: Icon(
+                            visibility ? Icons.visibility_off : Icons.visibility,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                        hint: S.of(context).password,
+                        validator: (value) {
+                          if (value?.isEmpty ?? true) return 'مطلوب';
+                          if (value!.length < 6) return 'كلمة السر صغيرة';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                        
+                      Text(
+                        S.of(context).confirm_password,
+                        style: const TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      TextFieldFormWidget(
+                        controller: _confirmPasswordController,
+                        obscureText: confirmVisibility,
+                        suffix: GestureDetector(
+                          onTap: () {
+                            setState(() => confirmVisibility = !confirmVisibility);
+                          },
+                          child: Icon(
+                            confirmVisibility ? Icons.visibility_off : Icons.visibility,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                        hint: S.of(context).confirm_password,
+                        validator: (value) {
+                          if (value != _passwordController.text) {
+                            return 'كلمة السر غير متطابقة';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            S.of(context).you_dont_have_an_account,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: _isLoading
+                                ? null
+                                : () => Navigator.pop(context),
+                            child: Text(
+                              S.of(context).create_an_account,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                                color: _isLoading ? Colors.grey : Colors.blue,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: CustomButtonWidget(
+                          text: S.of(context).create_an_account,
+                          onPressed: _isLoading
+                              ? null
+                              : () {
+                                  if (_formKey.currentState?.validate() ?? false) {
+                                    context.read<SignupCubit>().signUpWithPhone(
+                                      phoneNumber: _phoneController.text,
+                                      name: _nameController.text,
+                                      age: _ageController.text,
+                                      gender: _genderController.text,
+                                      password: _passwordController.text,
+                                      confirmPassword: _confirmPasswordController.text,
+                                    );
+                                  }
+                                },
+                        ),
+                      ),
+                      const SizedBox(height: 48),
                     ],
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Text(
-              S.of(context).phone_number,
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400),
-            ),
-            SizedBox(height: 5),
-            TextFieldFormWidget(
-              controller: _phoneController,
-              suffixText: "+966",
-              keyboardType: TextInputType.phone,
-              hint: S.of(context).phone_number,
-              validator: (value) {
-                if (value?.isEmpty ?? true) return 'Required';
-                if (value!.length < 9) return 'Invalid phone number';
-                return null;
-              },
-            ),
-            SizedBox(height: 15),
-      
-            Text(
-              S.of(context).password,
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400),
-            ),
-            SizedBox(height: 5),
-            TextFieldFormWidget(
-              controller: _passwordController,
-              obscureText: visibility,
-              suffix: GestureDetector(
-                onTap: () {
-                  visibility = !visibility;
-                  setState(() {});
-                },
-                child: visibility
-                    ? Icon(
-                        Icons.visibility_off,
-                        color: AppColors.primaryColor,
-                      )
-                    : Icon(Icons.visibility, color: AppColors.primaryColor),
-              ),
-              hint: S.of(context).password,
-              validator: (value) {
-                if (value?.isEmpty ?? true) return 'Required';
-                if (value!.length < 6) return 'Password too short';
-                return null;
-              },
-            ),
-            SizedBox(height: 15),
-      
-            Text(
-              S.of(context).confirm_password,
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w400),
-            ),
-            SizedBox(height: 5),
-            TextFieldFormWidget(
-              controller: _confirmPasswordController,
-              obscureText: confirmVisibility,
-              suffix: GestureDetector(
-                onTap: () {
-                  confirmVisibility = !confirmVisibility;
-                  setState(() {});
-                },
-                child: confirmVisibility
-                    ? Icon(
-                        Icons.visibility_off,
-                        color: AppColors.primaryColor,
-                      )
-                    : Icon(Icons.visibility, color: AppColors.primaryColor),
-              ),
-              hint: S.of(context).confirm_password,
-              validator: (value) {
-                if (value != _passwordController.text) {
-                  return 'Passwords do not match';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  S.of(context).you_dont_have_an_account,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    S.of(context).create_an_account,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: CustomButtonWidget(
-                text: S.of(context).create_an_account,
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    context.read<SignupCubit>().signUpWithPhone(
-                          phoneNumber: _phoneController.text,
-                          name: _nameController.text,
-                          age: _ageController.text,
-                          gender: _genderController.text,
-                          password: _passwordController.text,
-                          confirmPassword: _confirmPasswordController.text,
-                        );
-                  }
-                },
               ),
             ),
-            SizedBox(height: 48),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

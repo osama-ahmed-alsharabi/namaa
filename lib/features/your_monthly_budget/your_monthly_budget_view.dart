@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/cores/widgets/custom_button_widget.dart';
 import 'package:namaa/cores/widgets/text_field_form_widget.dart';
+import 'package:namaa/features/plan_page/plan_view.dart';
 import 'package:namaa/features/your_monthly_budget/model/budget_item_model.dart';
 import 'package:namaa/features/your_monthly_budget/view_model/cubit/monthly_budget_cubit.dart';
 import 'package:namaa/features/your_monthly_budget/view_model/cubit/monthly_budget_state.dart';
@@ -221,6 +222,7 @@ class _YourMonthlyBudgetViewState extends State<YourMonthlyBudgetView> {
                                 text: "التالي",
                                 onPressed: () {
                                   // Navigate to next screen
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>PlanView()));
                                 },
                               ),
                             ),

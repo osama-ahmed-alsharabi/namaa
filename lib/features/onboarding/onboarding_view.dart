@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:namaa/cores/assets.dart';
 import 'package:namaa/cores/widgets/custom_button_widget.dart';
 import 'package:namaa/features/auth/login/views/login_view.dart';
-import 'package:namaa/features/auth/singup/view_model/cubit/signup_cubit.dart';
-import 'package:namaa/features/auth/singup/views/sighup_view.dart';
+import 'package:namaa/features/auth/singup/views/signup_view.dart';
 import 'package:namaa/generated/l10n.dart';
 
 class OnboardingView extends StatelessWidget {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/cores/widgets/custom_button_widget.dart';
 import 'package:namaa/cores/widgets/text_field_form_widget.dart';
-import 'package:namaa/features/auth/singup/views/sighup_view.dart';
+import 'package:namaa/features/auth/singup/views/signup_view.dart';
 import 'package:namaa/generated/l10n.dart';
 
 class LoginFormWidget extends StatefulWidget {
