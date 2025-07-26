@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/features/auth/singup/view_model/cubit/signup_cubit.dart';
+import 'package:namaa/features/chat/view_model/cubit/chat_cubit.dart';
+import 'package:namaa/features/home/views/home_view.dart';
 import 'package:namaa/features/splash/view/splash_view.dart';
 import 'package:namaa/features/start_page/start_view.dart';
 import 'package:namaa/features/your_monthly_budget/view_model/cubit/monthly_budget_cubit.dart';
@@ -25,6 +27,8 @@ class Namaa extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => SignupCubit()),
         BlocProvider(create: (context) => BudgetCubit()),
+        BlocProvider(create: (context) => ChatCubit()),
+        BlocProvider(create: (context) => HomeCubit()),
       ],
       child: MaterialApp(
         theme: ThemeData(
