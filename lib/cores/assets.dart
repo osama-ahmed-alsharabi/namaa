@@ -2,17 +2,29 @@
 class Assets {
   Assets._();
   
+  /// Assets for imagesAttentionStop
+  /// assets/images/attention_stop.png
+  static const String imagesAttentionStop = "assets/images/attention_stop.png";
+
+  /// Assets for imagesBronsyHelloCharacter
+  /// assets/images/bronsy_hello_character.PNG
+  static const String imagesBronsyHelloCharacter = "assets/images/bronsy_hello_character.PNG";
+
+  /// Assets for imagesBronsySmallCharacter
+  /// assets/images/bronsy_small_character.PNG
+  static const String imagesBronsySmallCharacter = "assets/images/bronsy_small_character.PNG";
+
   /// Assets for imagesCard
   /// assets/images/card.png
   static const String imagesCard = "assets/images/card.png";
 
-  /// Assets for imagesCharacter
-  /// assets/images/character.png
-  static const String imagesCharacter = "assets/images/character.png";
-
   /// Assets for imagesEye
   /// assets/images/eye.svg
   static const String imagesEye = "assets/images/eye.svg";
+
+  /// Assets for imagesGoldSmallCharacter
+  /// assets/images/gold_small_character.png
+  static const String imagesGoldSmallCharacter = "assets/images/gold_small_character.png";
 
   /// Assets for imagesHome
   /// assets/images/home.png
@@ -34,6 +46,10 @@ class Assets {
   /// assets/images/namaa.png
   static const String imagesNamaa = "assets/images/namaa.png";
 
+  /// Assets for imagesNewCharacter
+  /// assets/images/new_character.png
+  static const String imagesNewCharacter = "assets/images/new_character.png";
+
   /// Assets for imagesReceipt
   /// assets/images/receipt.png
   static const String imagesReceipt = "assets/images/receipt.png";
@@ -46,9 +62,21 @@ class Assets {
   /// assets/images/settings.png
   static const String imagesSettings = "assets/images/settings.png";
 
+  /// Assets for imagesSleverSmallCharacter
+  /// assets/images/slever_small_character.PNG
+  static const String imagesSleverSmallCharacter = "assets/images/slever_small_character.PNG";
+
+  /// Assets for imagesSliverHelloCharacter
+  /// assets/images/sliver_hello_character.PNG
+  static const String imagesSliverHelloCharacter = "assets/images/sliver_hello_character.PNG";
+
   /// Assets for imagesStatistic
   /// assets/images/statistic.png
   static const String imagesStatistic = "assets/images/statistic.png";
+
+  /// Assets for imagesStatisticCharacter
+  /// assets/images/statistic_character.png
+  static const String imagesStatisticCharacter = "assets/images/statistic_character.png";
 
   /// Assets for imagesTest
   /// assets/images/test.png

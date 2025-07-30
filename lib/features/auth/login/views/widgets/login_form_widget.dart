@@ -38,12 +38,14 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
         if (state is LoginFailure) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.error)));
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         } else if (state is LoginSuccess) {
           // Navigate to home screen after successful login
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeView()),
+            MaterialPageRoute(builder: (context) => HomeView(
+              userId: state.userId,
+            )),
           );
         }
       },
@@ -116,7 +118,9 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
               child: BlocBuilder<LoginCubit, LoginState>(
                 builder: (context, state) {
                   if (state is LoginLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator(
+                      color: AppColors.brownColor,
+                    ));
                   }
                   return CustomButtonWidget(
                     text: S.of(context).login,

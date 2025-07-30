@@ -7,7 +7,8 @@ import 'package:namaa/features/goal/view_model/cubit/goal_cubit.dart';
 import 'package:namaa/features/your_monthly_budget/your_monthly_budget_view.dart';
 
 class GoalView extends StatefulWidget {
-  const GoalView({super.key});
+  final bool? isEdting;
+  const GoalView({super.key, this.isEdting});
 
   @override
   State<GoalView> createState() => _GoalViewState();
@@ -154,19 +155,25 @@ class _GoalViewState extends State<GoalView> {
                                       _expenseController.text,
                                     ),
                                   );
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          YourMonthlyBudgetView(),
-                                    ),
-                                  );
+                                  var confirem = widget.isEdting ?? false;
+                                  if (confirem) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("تم تعديل بياناتك المالية")));
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            YourMonthlyBudgetView(),
+                                      ),
+                                    );
+                                  }
                                 } catch (e) {
                                   // TODO
                                 }
                               }
                             },
-                            text: "التالي",
+                            text: widget.isEdting ?? false ? "تأكيد" : "التالي",
                             // isLoading: state is GoalLoading,
                           );
                         },

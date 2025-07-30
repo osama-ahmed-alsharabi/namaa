@@ -1,20 +1,19 @@
-// features/auth/login/cubit/login_cubit.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:namaa/cores/utils/api_key_const.dart';
+import 'package:namaa/main.dart';
 
 part 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(LoginInitial());
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> loginWithPhoneNumber(String phoneNumber, String password) async {
     emit(LoginLoading());
     try {
-      // First, verify the phone number exists in users collection
+      // تحقق من وجود المستخدم
       final querySnapshot = await _firestore
           .collection('users')
           .where('phone', isEqualTo: "+966$phoneNumber")
@@ -22,42 +21,23 @@ class LoginCubit extends Cubit<LoginState> {
           .get();
 
       if (querySnapshot.docs.isEmpty) {
-        emit(LoginFailure('رقم الجوال ليس مسجل'));
+        emit(LoginFailure('رقم الجوال غير مسجل'));
         return;
       }
 
       final userDoc = querySnapshot.docs.first;
       // final userData = userDoc.data();
 
-      // Verify password (assuming you have a password field)
+      // تحقق من كلمة المرور
       // if (userData['password'] != password) {
-      //   emit(LoginFailure('Incorrect password'));
+      //   emit(LoginFailure('كلمة المرور غير صحيحة'));
       //   return;
       // }
-
-      // If you want to use Firebase Phone Auth (optional)
-      // await _verifyPhoneNumber(phoneNumber);
-
-      emit(LoginSuccess(userId: userDoc.id));
+      userIdOfApp = userDoc.id;
+      final userId = userDoc.id;
+      emit(LoginSuccess(userId: userId));
     } catch (e) {
-      emit(LoginFailure(e.toString()));
+      emit(LoginFailure('حدث خطأ: $e'));
     }
-  }
-
-  // Optional: If you want to use Firebase Phone Auth verification
-  Future<void> _verifyPhoneNumber(String phoneNumber) async {
-    await _auth.verifyPhoneNumber(
-      phoneNumber: '+966$phoneNumber',
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        emit(LoginFailure(e.message ?? 'Verification failed'));
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        // You might want to handle OTP code sending here
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
-    );
   }
 }

@@ -7,7 +7,8 @@ class SingupView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(elevation: 0),
+       backgroundColor: Color(0xffFFFEF9),
+      appBar: AppBar(elevation: 0, backgroundColor: Color(0xffFFFEF9),),
       body: SafeArea(
         child: SingupFormWidget(),
       ),

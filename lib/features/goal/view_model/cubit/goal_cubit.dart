@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:namaa/features/goal/model/goal_model.dart';
+import 'package:namaa/main.dart';
 
 part 'goal_state.dart';
 
@@ -24,7 +25,7 @@ class GoalCubit extends Cubit<GoalState> {
   }) async {
     emit(GoalLoading());
     try {
-      final userId = _auth.currentUser?.uid;
+      final userId = userIdOfApp;
       if (userId == null) {
         emit(GoalError('User not authenticated'));
         return;

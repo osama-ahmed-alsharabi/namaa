@@ -7,11 +7,11 @@ import 'package:namaa/features/auth/singup/view_model/cubit/signup_cubit.dart';
 import 'package:namaa/features/chat/view_model/cubit/chat_cubit.dart';
 import 'package:namaa/features/home/views/home_view.dart';
 import 'package:namaa/features/splash/view/splash_view.dart';
-import 'package:namaa/features/start_page/start_view.dart';
+import 'package:namaa/features/stats/view_model/goal_monthly_cubit/goal_stats_cubit.dart';
 import 'package:namaa/features/your_monthly_budget/view_model/cubit/monthly_budget_cubit.dart';
 import 'package:namaa/firebase_options.dart';
 import 'package:namaa/generated/l10n.dart';
-
+String? userIdOfApp ;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -29,6 +29,9 @@ class Namaa extends StatelessWidget {
         BlocProvider(create: (context) => BudgetCubit()),
         BlocProvider(create: (context) => ChatCubit()),
         BlocProvider(create: (context) => HomeCubit()),
+        BlocProvider(create: (context) => GoalMonthlyCubit(
+          userIdOfApp: userIdOfApp!
+        )),
       ],
       child: MaterialApp(
         theme: ThemeData(

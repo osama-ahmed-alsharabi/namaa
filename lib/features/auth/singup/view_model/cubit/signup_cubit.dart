@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:namaa/main.dart';
 
 part 'signup_cubit.freezed.dart';
 part 'signup_state.dart';
@@ -112,6 +113,7 @@ class SignupCubit extends Cubit<SignupState> {
   ) async {
     try {
       final user = _auth.currentUser;
+       userIdOfApp = _auth.currentUser!.uid;
       if (user == null) {
         emit(const SignupState.error('User not found'));
         return;

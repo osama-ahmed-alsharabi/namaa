@@ -1,18 +1,16 @@
-
 // cubit/chat_cubit.dart
 import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:namaa/cores/utils/api_key_const.dart';
+import 'package:namaa/main.dart';
 
 part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  static const String _apiKey = "";
   static const String _apiUrl = 'https://api.openai.com/v1/chat/completions';
 
   ChatCubit() : super(ChatInitial()) {
@@ -23,7 +21,7 @@ class ChatCubit extends Cubit<ChatState> {
     try {
       emit(ChatLoading());
 
-      final userId = _auth.currentUser?.uid;
+      final userId = userIdOfApp;
       if (userId == null) {
         emit(ChatError('المستخدم غير مسجل الدخول'));
         return;
@@ -60,7 +58,8 @@ class ChatCubit extends Cubit<ChatState> {
 
       final goalsData = goalsSnapshot.docs.map((doc) => doc.data()).toList();
 
-      final introPrompt = '''
+      final introPrompt =
+          '''
 لدى المستخدم الوضع المالي التالي:
 - الدخل الشهري: $monthlyIncome
 - مجموع المصاريف: $totalExpenses
@@ -77,20 +76,22 @@ ${goalsData.map((goal) => "- ${goal['goalDescription']}: الحد اليومي �
 
       final initialMessage = await _generateAIResponse(introPrompt);
 
-      emit(ChatLoaded(
-        messages: [
-          ChatMessage(
-            text: initialMessage,
-            isUser: false,
-            timestamp: DateTime.now(),
-          ),
-        ],
-        monthlyIncome: monthlyIncome,
-        budgetItems: budgetItems,
-        goalsData: goalsData,
-        totalExpenses: totalExpenses,
-        totalSavings: totalSavings,
-      ));
+      emit(
+        ChatLoaded(
+          messages: [
+            ChatMessage(
+              text: initialMessage,
+              isUser: false,
+              timestamp: DateTime.now(),
+            ),
+          ],
+          monthlyIncome: monthlyIncome,
+          budgetItems: budgetItems,
+          goalsData: goalsData,
+          totalExpenses: totalExpenses,
+          totalSavings: totalSavings,
+        ),
+      );
     } catch (e) {
       emit(ChatError('فشل تحميل المحادثة: $e'));
     }
@@ -107,12 +108,15 @@ ${goalsData.map((goal) => "- ${goal['goalDescription']}: الحد اليومي �
         timestamp: DateTime.now(),
       );
 
-      emit(currentState.copyWith(
-        messages: [...currentState.messages, userMessage],
-        isLoading: true,
-      ));
+      emit(
+        currentState.copyWith(
+          messages: [...currentState.messages, userMessage],
+          isLoading: true,
+        ),
+      );
 
-      final contextPrompt = '''
+      final contextPrompt =
+          '''
 بيانات المستخدم:
 - الدخل الشهري: ${currentState.monthlyIncome}
 - المصاريف: ${currentState.totalExpenses}
@@ -140,10 +144,12 @@ ${currentState.messages.map((m) => m.isUser ? 'مستخدم: ${m.text}' : 'مس�
         timestamp: DateTime.now(),
       );
 
-      emit(currentState.copyWith(
-        messages: [...currentState.messages, userMessage, aiMessage],
-        isLoading: false,
-      ));
+      emit(
+        currentState.copyWith(
+          messages: [...currentState.messages, userMessage, aiMessage],
+          isLoading: false,
+        ),
+      );
     } catch (e) {
       emit(ChatError('فشل إرسال الرسالة: $e'));
     }
@@ -153,7 +159,7 @@ ${currentState.messages.map((m) => m.isUser ? 'مستخدم: ${m.text}' : 'مس�
     final uri = Uri.parse(_apiUrl);
     final headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $_apiKey',
+      'Authorization': 'Bearer ${ApiKeyConst.apiKey}',
     };
 
     final body = jsonEncode({
@@ -161,12 +167,10 @@ ${currentState.messages.map((m) => m.isUser ? 'مستخدم: ${m.text}' : 'مس�
       'messages': [
         {
           'role': 'system',
-          'content': 'أنت مساعد مالي ذكي تتحدث فقط باللغة العربية، تساعد المستخدم في إدارة دخله ومصروفاته وتحقيق أهدافه المالية بنصائح دقيقة وعملية.',
+          'content':
+              'أنت مساعد مالي ذكي تتحدث فقط باللغة العربية، تساعد المستخدم في إدارة دخله ومصروفاته وتحقيق أهدافه المالية بنصائح دقيقة وعملية.',
         },
-        {
-          'role': 'user',
-          'content': prompt,
-        }
+        {'role': 'user', 'content': prompt},
       ],
       'temperature': 0.7,
     });

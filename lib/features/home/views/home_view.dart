@@ -1,7 +1,7 @@
 // home_cubit.dart
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -9,19 +9,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:namaa/cores/assets.dart';
+import 'package:namaa/cores/utils/api_key_const.dart';
+import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/cores/widgets/custom_bottom_navigation_bar.dart';
+import 'package:namaa/features/profile/views/profile_view.dart';
+import 'package:namaa/main.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(HomeInitial());
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  static const String _apiKey = "";
 
   Future<void> fetchHomeData() async {
     emit(HomeLoading());
     try {
-      final userId = _auth.currentUser?.uid;
+      final userId = userIdOfApp;
       if (userId == null) {
         emit(HomeError("المستخدم غير مسجل الدخول"));
         return;
@@ -68,7 +70,7 @@ class HomeCubit extends Cubit<HomeState> {
       Uri.parse('https://api.openai.com/v1/chat/completions'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $_apiKey',
+        'Authorization': 'Bearer ${ApiKeyConst.apiKey}',
       },
       body: jsonEncode({
         'model': 'gpt-3.5-turbo-0125',
@@ -119,7 +121,8 @@ class HomeError extends HomeState {
 // home_view.dart
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final String? userId;
+  const HomeView({super.key, this.userId});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -137,11 +140,14 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffFFFEF9),
       body: SafeArea(
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
             if (state is HomeLoading || state is HomeInitial) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.brownColor),
+              );
             } else if (state is HomeError) {
               return Center(child: Text(state.message));
             } else if (state is HomeLoaded) {
@@ -151,7 +157,19 @@ class _HomeViewState extends State<HomeView> {
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
                       children: [
-                        SvgPicture.asset(Assets.imagesUser),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfileView(
+                                  userIdOfApp: userIdOfApp!,
+                                ),
+                              ),
+                            );
+                          },
+                          child: SvgPicture.asset(Assets.imagesUser),
+                        ),
                         const Spacer(),
                         GestureDetector(
                           onTap: () {
@@ -162,7 +180,12 @@ class _HomeViewState extends State<HomeView> {
                           child: SvgPicture.asset(Assets.imagesEye),
                         ),
                         const SizedBox(width: 10),
-                        SvgPicture.asset(Assets.imagesLogout),
+                        GestureDetector(
+                          onTap: () {
+                            SystemNavigator.pop();
+                          },
+                          child: SvgPicture.asset(Assets.imagesLogout),
+                        ),
                       ],
                     ),
                   ),
@@ -171,11 +194,14 @@ class _HomeViewState extends State<HomeView> {
                     children: [
                       Stack(
                         children: [
-                          Image.asset(Assets.imagesMessage),
+                          Image.asset(
+                            width: MediaQuery.sizeOf(context).width * 0.8,
+                            Assets.imagesMessage,
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: SizedBox(
-                              width: MediaQuery.sizeOf(context).width * 0.8,
+                              width: MediaQuery.sizeOf(context).width * 0.65,
                               child: Text(
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 4,
@@ -194,7 +220,7 @@ class _HomeViewState extends State<HomeView> {
                   Flexible(
                     child: Padding(
                       padding: const EdgeInsets.only(right: 20, left: 100),
-                      child: Image.asset(Assets.imagesTest),
+                      child: Image.asset(Assets.imagesSliverHelloCharacter),
                     ),
                   ),
                   Expanded(
@@ -208,7 +234,6 @@ class _HomeViewState extends State<HomeView> {
                             top: 55,
                             child: Row(
                               children: [
-                               
                                 Text(
                                   _showBalance
                                       ? state.monthlyIncome.toStringAsFixed(2)
@@ -219,11 +244,15 @@ class _HomeViewState extends State<HomeView> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(width: 5,),
-                                 SizedBox(
+                                SizedBox(width: 15),
+                                SizedBox(
                                   width: 25,
                                   height: 25,
-                                  child: SvgPicture.asset(Assets.imagesRyal , color: Colors.white,)),
+                                  child: SvgPicture.asset(
+                                    Assets.imagesRyal,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -232,7 +261,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const CustomBottomNavigationBar(),
+                  const CustomBottomNavigationBar(pageName: "home"),
                 ],
               );
             }

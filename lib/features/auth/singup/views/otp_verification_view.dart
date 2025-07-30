@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/cores/widgets/custom_button_widget.dart';
 import 'package:namaa/features/auth/singup/view_model/cubit/signup_cubit.dart';
 import 'package:namaa/features/start_page/start_view.dart';
@@ -46,9 +47,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           loading: () => setState(() => _isLoading = true),
           error: (message) {
             setState(() => _isLoading = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(message)));
           },
           success: () {
             setState(() => _isLoading = false);
@@ -64,9 +65,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         child: ModalProgressHUD(
           inAsyncCall: _isLoading,
           opacity: 0.5,
-          progressIndicator: const CircularProgressIndicator(),
+
+          progressIndicator: CircularProgressIndicator(
+            color: AppColors.brownColor,
+          ),
           child: Scaffold(
+            backgroundColor: Color(0xffFFFEF9),
             appBar: AppBar(
+              backgroundColor: Color(0xffFFFEF9),
+              elevation: 0,
               title: Text(S.of(context).verify_phone),
               leading: _isLoading
                   ? null
@@ -114,14 +121,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             : () {
                                 if (_otpController.text.length == 6) {
                                   context.read<SignupCubit>().verifyOtp(
-                                        verificationId: widget.verificationId,
-                                        smsCode: _otpController.text,
-                                        phoneNumber: widget.phoneNumber,
-                                        name: widget.name,
-                                        age: widget.age,
-                                        gender: widget.gender,
-                                        password: widget.password,
-                                      );
+                                    verificationId: widget.verificationId,
+                                    smsCode: _otpController.text,
+                                    phoneNumber: widget.phoneNumber,
+                                    name: widget.name,
+                                    age: widget.age,
+                                    gender: widget.gender,
+                                    password: widget.password,
+                                  );
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -139,13 +146,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           : () {
                               // Resend OTP functionality
                               context.read<SignupCubit>().signUpWithPhone(
-                                    phoneNumber: widget.phoneNumber,
-                                    name: widget.name,
-                                    age: widget.age,
-                                    gender: widget.gender,
-                                    password: widget.password,
-                                    confirmPassword: widget.password,
-                                  );
+                                phoneNumber: widget.phoneNumber,
+                                name: widget.name,
+                                age: widget.age,
+                                gender: widget.gender,
+                                password: widget.password,
+                                confirmPassword: widget.password,
+                              );
                             },
                       child: Text(
                         S.of(context).resend_code,

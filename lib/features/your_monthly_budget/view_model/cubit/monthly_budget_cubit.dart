@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:namaa/features/your_monthly_budget/model/budget_item_model.dart';
 import 'package:namaa/features/your_monthly_budget/view_model/cubit/monthly_budget_state.dart';
+import 'package:namaa/main.dart';
 
 class BudgetCubit extends Cubit<BudgetState> {
   final FirebaseFirestore _firestore;
@@ -18,7 +19,7 @@ class BudgetCubit extends Cubit<BudgetState> {
         super(BudgetInitial());
 
   Stream<List<BudgetItemModel>> getBudgetItems() {
-    final userId = _auth.currentUser?.uid;
+    final userId = userIdOfApp;
     if (userId == null) return Stream.value([]);
 
     return _firestore
@@ -35,9 +36,9 @@ class BudgetCubit extends Cubit<BudgetState> {
   Future<void> addBudgetItem(String category, double amount) async {
   emit(BudgetLoading());
   try {
-    final userId = _auth.currentUser?.uid;
+    final userId = userIdOfApp;
     if (userId == null) {
-      emit(BudgetError('User not authenticated'));
+      emit(BudgetError('المستخدم غير مسجل'));
       return;
     }
 
@@ -51,7 +52,7 @@ class BudgetCubit extends Cubit<BudgetState> {
           'createdAt': FieldValue.serverTimestamp(), // Use server timestamp
         });
 
-    emit(BudgetSuccess('Budget item added successfully'));
+    emit(BudgetSuccess('تم الاضافة بنجاح'));
   } catch (e) {
     emit(BudgetError(e.toString()));
   }
@@ -60,9 +61,9 @@ class BudgetCubit extends Cubit<BudgetState> {
   Future<void> updateBudgetItem(String id, double newAmount) async {
     emit(BudgetLoading());
     try {
-      final userId = _auth.currentUser?.uid;
+      final userId = userIdOfApp;
       if (userId == null) {
-        emit(BudgetError('User not authenticated'));
+        emit(BudgetError('المستخدم غير مسجل'));
         return;
       }
 
@@ -73,7 +74,7 @@ class BudgetCubit extends Cubit<BudgetState> {
           .doc(id)
           .update({'amount': newAmount});
 
-      emit(BudgetSuccess('Budget item updated successfully'));
+      emit(BudgetSuccess('تم التعديل بنجاح'));
     } catch (e) {
       emit(BudgetError(e.toString()));
     }
@@ -82,9 +83,9 @@ class BudgetCubit extends Cubit<BudgetState> {
   Future<void> deleteBudgetItem(String id) async {
     emit(BudgetLoading());
     try {
-      final userId = _auth.currentUser?.uid;
+      final userId = userIdOfApp;
       if (userId == null) {
-        emit(BudgetError('User not authenticated'));
+        emit(BudgetError('المستخدم غير مسجل '));
         return;
       }
 
@@ -95,7 +96,7 @@ class BudgetCubit extends Cubit<BudgetState> {
           .doc(id)
           .delete();
 
-      emit(BudgetSuccess('Budget item deleted successfully'));
+      emit(BudgetSuccess('تم حذف بنجاح'));
     } catch (e) {
       emit(BudgetError(e.toString()));
     }

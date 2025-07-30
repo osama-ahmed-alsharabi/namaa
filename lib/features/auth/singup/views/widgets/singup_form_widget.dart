@@ -28,6 +28,9 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
 
+  final List<String> genders = ['أنثى', 'ذكر'];
+  String? selectedGender;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -36,6 +39,7 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    selectedGender = genders[0];
     super.dispose();
   }
 
@@ -47,9 +51,9 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
           loading: () => setState(() => _isLoading = true),
           error: (message) {
             setState(() => _isLoading = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(message)));
           },
           codeSent: (verificationId, phoneNumber, name, age, gender, password) {
             setState(() => _isLoading = false);
@@ -77,6 +81,9 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
           canPop: !_isLoading,
           child: ModalProgressHUD(
             inAsyncCall: _isLoading,
+            progressIndicator: CircularProgressIndicator(
+              color: AppColors.brownColor,
+            ),
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -94,7 +101,7 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                         ),
                       ),
                       const SizedBox(height: 30),
-                        
+
                       Text(
                         S.of(context).name,
                         style: const TextStyle(
@@ -103,11 +110,12 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                        
+
                       TextFieldFormWidget(
                         controller: _nameController,
                         hint: S.of(context).name,
-                        validator: (value) => value?.isEmpty ?? true ? 'مطلوب' : null,
+                        validator: (value) =>
+                            value?.isEmpty ?? true ? 'مطلوب' : null,
                       ),
                       const SizedBox(height: 10),
                       Row(
@@ -124,7 +132,7 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                                   ),
                                 ),
                                 const SizedBox(height: 5),
-                        
+
                                 TextFieldFormWidget(
                                   controller: _ageController,
                                   hint: S.of(context).age,
@@ -141,7 +149,8 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 5),
-                        
+
+                                // داخل عمود الجنس (استبدل الـ TextFieldFormWidget بالجديد):
                                 Text(
                                   S.of(context).gender,
                                   style: const TextStyle(
@@ -149,11 +158,35 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
-                                TextFieldFormWidget(
-                                  controller: _genderController,
-                                  hint: S.of(context).gender,
+                                const SizedBox(height: 5),
+                                DropdownButtonFormField<String>(
+                                  value: selectedGender,
+                                  items: genders.map((g) {
+                                    return DropdownMenuItem(
+                                      value: g,
+                                      child: Text(g),
+                                    );
+                                  }).toList(),
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedGender = val!;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                      horizontal: 10,
+                                    ),
+                                  ),
                                   validator: (value) =>
-                                      value?.isEmpty ?? true ? 'مطلوب' : null,
+                                      value == null || value.isEmpty
+                                      ? 'مطلوب'
+                                      : null,
                                 ),
                               ],
                             ),
@@ -181,7 +214,7 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                         },
                       ),
                       const SizedBox(height: 15),
-                        
+
                       Text(
                         S.of(context).password,
                         style: const TextStyle(
@@ -198,7 +231,9 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                             setState(() => visibility = !visibility);
                           },
                           child: Icon(
-                            visibility ? Icons.visibility_off : Icons.visibility,
+                            visibility
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: AppColors.primaryColor,
                           ),
                         ),
@@ -210,7 +245,7 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                         },
                       ),
                       const SizedBox(height: 15),
-                        
+
                       Text(
                         S.of(context).confirm_password,
                         style: const TextStyle(
@@ -224,10 +259,14 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                         obscureText: confirmVisibility,
                         suffix: GestureDetector(
                           onTap: () {
-                            setState(() => confirmVisibility = !confirmVisibility);
+                            setState(
+                              () => confirmVisibility = !confirmVisibility,
+                            );
                           },
                           child: Icon(
-                            confirmVisibility ? Icons.visibility_off : Icons.visibility,
+                            confirmVisibility
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: AppColors.primaryColor,
                           ),
                         ),
@@ -273,14 +312,16 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                           onPressed: _isLoading
                               ? null
                               : () {
-                                  if (_formKey.currentState?.validate() ?? false) {
+                                  if (_formKey.currentState?.validate() ??
+                                      false) {
                                     context.read<SignupCubit>().signUpWithPhone(
                                       phoneNumber: _phoneController.text,
                                       name: _nameController.text,
                                       age: _ageController.text,
                                       gender: _genderController.text,
                                       password: _passwordController.text,
-                                      confirmPassword: _confirmPasswordController.text,
+                                      confirmPassword:
+                                          _confirmPasswordController.text,
                                     );
                                   }
                                 },

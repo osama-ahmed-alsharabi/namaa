@@ -9,7 +9,8 @@ import 'package:namaa/features/your_monthly_budget/view_model/cubit/monthly_budg
 import 'package:namaa/features/your_monthly_budget/view_model/cubit/monthly_budget_state.dart';
 
 class YourMonthlyBudgetView extends StatefulWidget {
-  const YourMonthlyBudgetView({super.key});
+  final bool? isEditing;
+  const YourMonthlyBudgetView({super.key, this.isEditing});
 
   @override
   State<YourMonthlyBudgetView> createState() => _YourMonthlyBudgetViewState();
@@ -18,6 +19,7 @@ class YourMonthlyBudgetView extends StatefulWidget {
 class _YourMonthlyBudgetViewState extends State<YourMonthlyBudgetView> {
   final Map<String, TextEditingController> _controllers = {};
   final _newCategoryController = TextEditingController();
+  final _savingCategoryName = "الادخار";
 
   @override
   void dispose() {
@@ -26,7 +28,23 @@ class _YourMonthlyBudgetViewState extends State<YourMonthlyBudgetView> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+
+    // أضف "الادخار" تلقائيًا إذا لم يكن موجودًا
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final cubit = context.read<BudgetCubit>();
+      final items = await cubit.getBudgetItems().first;
+      final exists = items.any((item) => item.category == _savingCategoryName);
+      if (!exists) {
+        cubit.addBudgetItem(_savingCategoryName, 0);
+      }
+    });
+  }
+
   void _showAddCategoryDialog(BuildContext context) {
+    _newCategoryController.clear();
     showDialog(
       context: context,
       builder: (context) {
@@ -91,17 +109,18 @@ class _YourMonthlyBudgetViewState extends State<YourMonthlyBudgetView> {
 
   Widget _buildBudgetItem(BudgetItemModel item) {
     if (!_controllers.containsKey(item.id)) {
-      _controllers[item.id] = TextEditingController(text: item.amount.toString());
+      _controllers[item.id] = TextEditingController(
+        text: item.amount.toString(),
+      );
     }
+
+    final isSaving = item.category == _savingCategoryName;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Row(
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(item.category),
-          ),
+          Expanded(flex: 2, child: Text(item.category)),
           SizedBox(width: 10),
           Expanded(
             flex: 3,
@@ -114,16 +133,18 @@ class _YourMonthlyBudgetViewState extends State<YourMonthlyBudgetView> {
           IconButton(
             icon: Icon(Icons.save),
             onPressed: () {
-              final newAmount = double.tryParse(_controllers[item.id]!.text) ?? 0;
+              final newAmount =
+                  double.tryParse(_controllers[item.id]!.text) ?? 0;
               context.read<BudgetCubit>().updateBudgetItem(item.id, newAmount);
             },
           ),
-          IconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-              context.read<BudgetCubit>().deleteBudgetItem(item.id);
-            },
-          ),
+          if (!isSaving)
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                context.read<BudgetCubit>().deleteBudgetItem(item.id);
+              },
+            ),
         ],
       ),
     );
@@ -163,7 +184,10 @@ class _YourMonthlyBudgetViewState extends State<YourMonthlyBudgetView> {
                   SizedBox(height: 15),
                   Text(
                     "خطّط لميزانيتك، وابدأ بصناعة الفارق في نمائك المالي!",
-                    style: TextStyle(fontSize: 15, color: AppColors.primaryColor),
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors.primaryColor,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 15),
@@ -187,7 +211,8 @@ class _YourMonthlyBudgetViewState extends State<YourMonthlyBudgetView> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: IconButton(
-                                onPressed: () => _showAddCategoryDialog(context),
+                                onPressed: () =>
+                                    _showAddCategoryDialog(context),
                                 icon: Icon(Icons.add, color: Colors.white),
                               ),
                             ),
@@ -203,26 +228,50 @@ class _YourMonthlyBudgetViewState extends State<YourMonthlyBudgetView> {
                       if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       }
-    
+
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
                       }
-    
+
                       final budgetItems = snapshot.data ?? [];
-    
+
+                      // اجعل "الادخار" أول فئة دائمًا
+                      budgetItems.sort((a, b) {
+                        if (a.category == _savingCategoryName) return -1;
+                        if (b.category == _savingCategoryName) return 1;
+                        return 0;
+                      });
+
                       return Column(
                         children: [
                           ...budgetItems.map(_buildBudgetItem).toList(),
                           SizedBox(height: 20),
                           if (budgetItems.isNotEmpty)
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 40.0),
                               child: CustomButtonWidget(
                                 height: 60,
-                                text: "التالي",
+                                text: widget.isEditing ?? false
+                                    ? "تأكيد"
+                                    : "التالي",
                                 onPressed: () {
-                                  // Navigate to next screen
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>PlanView()));
+                                  var confirm = widget.isEditing ?? false;
+                                  if (confirm) {
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("تم تعديل بياناتك "),
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PlanView(),
+                                      ),
+                                    );
+                                  }
                                 },
                               ),
                             ),

@@ -17,9 +17,7 @@ class StartView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
-                "هلا والله !"
-                "أنا درهم، مستشارك المالي الذكي "
-                "مع بعض، بنخطط، نوفر، ونحقق أهدافك  ",
+               "مرحبا بك , في نَماء ! ",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -28,11 +26,26 @@ class StartView extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Text(
+                "هلا والله !"
+                "أنا درهم، مستشارك المالي الذكي "
+                "مع بعض، بنخطط، نوفر، ونحقق أهدافك  ",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+            ),
             SizedBox(height: 10),
             Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Image.asset(Assets.imagesTest),
+                child: Image.asset(Assets.imagesStatisticCharacter ),
               ),
             ),
             SizedBox(height: 10),

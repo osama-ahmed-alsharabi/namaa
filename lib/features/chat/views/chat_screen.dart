@@ -12,23 +12,33 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xffFFFEF9),
       appBar: AppBar(
         backgroundColor: Colors.white,
         toolbarHeight: 70,
         title: const Text("درهم..."),
-        leading: Image.asset(Assets.imagesCharacter),
+        leading: Image.asset(Assets.imagesSleverSmallCharacter),
+        actions: [
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: IconButton(onPressed: () {
+              Navigator.pop(context);
+            }, icon: Icon(Icons.arrow_back_ios_new_rounded))),
+        ],
       ),
       body: BlocConsumer<ChatCubit, ChatState>(
         listener: (context, state) {
           if (state is ChatError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         builder: (context, state) {
           if (state is ChatInitial || state is ChatLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(
+              color: AppColors.brownColor,
+            ));
           }
 
           if (state is ChatError) {
@@ -73,7 +83,7 @@ class ChatScreen extends StatelessWidget {
                         margin: EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: AppColors.brownColor,
-                          borderRadius: BorderRadius.circular(12)
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: IconButton(
                           icon: const Icon(Icons.send),
@@ -107,7 +117,7 @@ class ChatScreen extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: message.isUser
-              ? Colors.white
+              ? const Color.fromARGB(255, 219, 218, 218)
               : const Color.fromRGBO(217, 208, 154, 0.4),
           borderRadius: BorderRadius.circular(12),
         ),
