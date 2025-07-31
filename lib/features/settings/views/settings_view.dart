@@ -12,7 +12,10 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+       backgroundColor: const Color(0xffFFFEF9),
+      appBar: AppBar(
+         backgroundColor: const Color(0xffFFFEF9),
+      ),
       body: SafeArea(
         child: Column(
           children: [

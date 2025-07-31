@@ -1,8 +1,6 @@
-// goal_monthly_cubit.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:namaa/features/stats/view_model/goal_monthly_cubit/goal_stats_state.dart';
-
 
 class GoalMonthlyCubit extends Cubit<GoalMonthlyState> {
   final String userIdOfApp;
@@ -13,54 +11,57 @@ class GoalMonthlyCubit extends Cubit<GoalMonthlyState> {
   Future<void> fetchGoalMonthly() async {
     emit(GoalMonthlyLoading());
     try {
-      // جلب آخر هدف
-      final goalsSnap = await _firestore
-          .collection('users')
-          .doc(userIdOfApp)
-          .collection('goals')
-          .orderBy('createdAt', descending: true)
-          .limit(1)
-          .get();
-
-      if (goalsSnap.docs.isEmpty) {
-        emit(GoalMonthlyError('لا يوجد هدف.'));
-        return;
-      }
-
-      final goal = goalsSnap.docs.first.data();
-      final double monthlyIncome = (goal['monthlyIncome'] as num?)?.toDouble() ?? 0;
-      final String goalDescription = goal['goalDescription'] ?? '';
-
-      // حساب مجموع الادخار لهذا الشهر
-      DateTime now = DateTime.now();
-      DateTime monthStart = DateTime(now.year, now.month, 1);
-
-      final savingsSnap = await _firestore
+      // 1. Get monthly savings goal from monthly_budget (الادخار category)
+      final monthlyBudgetSnap = await _firestore
           .collection('users')
           .doc(userIdOfApp)
           .collection('monthly_budget')
           .where('category', isEqualTo: 'الادخار')
-          .where('createdAt', isGreaterThanOrEqualTo: monthStart)
           .get();
 
-      double totalSaved = 0;
-      for (var doc in savingsSnap.docs) {
-        final amount = (doc['amount'] as num?)?.toDouble() ?? 0;
-        totalSaved += amount;
+      double monthlySavingsGoal = 0;
+      if (monthlyBudgetSnap.docs.isNotEmpty) {
+        // Sum all savings goals (though typically there should be just one)
+        for (var doc in monthlyBudgetSnap.docs) {
+          monthlySavingsGoal += (doc.data()['amount'] as num?)?.toDouble() ?? 0;
+        }
       }
 
-      final remaining = (monthlyIncome - totalSaved).clamp(0, monthlyIncome);
-      final percent = monthlyIncome > 0 ? (totalSaved / monthlyIncome).clamp(0, 1) : 0.0;
+      // 2. Get actual savings from daily_results
+      final now = DateTime.now();
+      final startOfMonth = DateTime(now.year, now.month, 1);
+      final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+
+      final dailyResultsSnap = await _firestore
+          .collection('users')
+          .doc(userIdOfApp)
+          .collection('daily_results')
+          .where('date', isGreaterThanOrEqualTo: startOfMonth)
+          .where('date', isLessThanOrEqualTo: endOfMonth)
+          .get();
+
+      double totalSavedFromDaily = 0;
+      for (var doc in dailyResultsSnap.docs) {
+        final answers = doc.data()['answers'] as Map<String, dynamic>? ?? {};
+        if (answers.containsKey('الادخار')) {
+          totalSavedFromDaily += (answers['الادخار'] as num).toDouble();
+        }
+      }
+
+      // 3. Calculate remaining and percentage
+      final remaining = (monthlySavingsGoal - totalSavedFromDaily).clamp(0, monthlySavingsGoal);
+      final percent = monthlySavingsGoal > 0 
+          ? (totalSavedFromDaily / monthlySavingsGoal).clamp(0, 1) 
+          : 0.0;
 
       emit(GoalMonthlyLoaded(
-        monthlyIncome: monthlyIncome,
-        totalSaved: totalSaved,
-        remaining: remaining,
-        percent: percent,
-        goalDescription: goalDescription,
+        monthlySavingsGoal: monthlySavingsGoal,
+        totalSavedFromDaily: totalSavedFromDaily,
+        remaining: remaining.toDouble(),
+        percent: percent.toDouble(),
       ));
     } catch (e) {
-      emit(GoalMonthlyError('خطأ في التحليل: $e'));
+      emit(GoalMonthlyError('خطأ في جلب بيانات الادخار: $e'));
     }
   }
 }

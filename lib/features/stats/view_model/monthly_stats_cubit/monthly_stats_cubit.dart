@@ -1,4 +1,3 @@
-// monthly_stats_cubit.dart
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
@@ -18,25 +17,30 @@ class MonthlyStatsCubit extends Cubit<MonthlyStatsState> {
       final startOfMonth = DateTime(now.year, now.month, 1);
       final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
 
-      final budgetSnap = await _firestore
+      final dailyResultsSnap = await _firestore
           .collection('users')
           .doc(userIdOfApp)
-          .collection('monthly_budget')
-          .where('createdAt', isGreaterThanOrEqualTo: startOfMonth)
-          .where('createdAt', isLessThanOrEqualTo: endOfMonth)
+          .collection('daily_results')
+          .where('date', isGreaterThanOrEqualTo: startOfMonth)
+          .where('date', isLessThanOrEqualTo: endOfMonth)
           .get();
 
-      // الأسبوع 1 = الأيام 1-7، 2=8-14، 3=15-21، 4=22-نهاية الشهر
-      Map<int, Map<String, double>> monthData = {1:{},2:{},3:{},4:{}};
-      for (var doc in budgetSnap.docs) {
+      // Week 1 = Days 1-7, Week 2=8-14, Week 3=15-21, Week 4=22-end of month
+      Map<int, Map<String, double>> monthData = {1: {}, 2: {}, 3: {}, 4: {}};
+      
+      for (var doc in dailyResultsSnap.docs) {
         final data = doc.data();
-        final category = data['category'] ?? 'غير مصنّف';
-        final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
-        final createdAt = (data['createdAt'] as Timestamp).toDate();
-        final day = createdAt.day;
-        int weekNum = ((day - 1) ~/ 7) + 1; // 1 إلى 4
+        final answers = data['answers'] as Map<String, dynamic>? ?? {};
+        final date = (data['date'] as Timestamp).toDate();
+        final day = date.day;
+        
+        int weekNum = ((day - 1) ~/ 7) + 1; // 1 to 4
         weekNum = weekNum.clamp(1, 4);
-        monthData[weekNum]![category] = (monthData[weekNum]![category] ?? 0) + amount;
+        
+        answers.forEach((category, value) {
+          double amount = (value as num).toDouble();
+          monthData[weekNum]![category] = (monthData[weekNum]![category] ?? 0) + amount;
+        });
       }
 
       emit(MonthlyStatsLoaded(monthData: monthData));

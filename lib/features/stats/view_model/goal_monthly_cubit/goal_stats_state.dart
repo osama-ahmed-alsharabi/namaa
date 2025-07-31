@@ -1,23 +1,21 @@
-// goal_monthly_state.dart
 
 abstract class GoalMonthlyState {}
 
 class GoalMonthlyInitial extends GoalMonthlyState {}
+
 class GoalMonthlyLoading extends GoalMonthlyState {}
 
 class GoalMonthlyLoaded extends GoalMonthlyState {
-  final double monthlyIncome;
-  final double totalSaved;
-  final num remaining;
-  final num percent;
-  final String goalDescription;
+  final double monthlySavingsGoal;
+  final double totalSavedFromDaily;
+  final double remaining;
+  final double percent;
 
   GoalMonthlyLoaded({
-    required this.monthlyIncome,
-    required this.totalSaved,
+    required this.monthlySavingsGoal,
+    required this.totalSavedFromDaily,
     required this.remaining,
     required this.percent,
-    required this.goalDescription,
   });
 }
 

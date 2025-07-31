@@ -16,89 +16,97 @@ import 'package:namaa/features/profile/views/profile_view.dart';
 import 'package:namaa/main.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit() : super(HomeInitial());
+  HomeCubit() : super(HomeInitial()) {
+    _initMonthlyIncomeStream();
+  }
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Stream<double>? _monthlyIncomeStream;
+  String _motivationalMessage = "أهلاً بك! لا تنسَ أن كل خطوة صغيرة تقربك من أهدافك.";
+
+  Stream<double>? get monthlyIncomeStream => _monthlyIncomeStream;
+  String get motivationalMessage => _motivationalMessage;
+
+  void _initMonthlyIncomeStream() {
+    final userId = userIdOfApp;
+    if (userId == null) {
+      emit(HomeError("المستخدم غير مسجل الدخول"));
+      return;
+    }
+
+    _monthlyIncomeStream = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('goals')
+        .orderBy('createdAt', descending: true)
+        .limit(1)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      if (snapshot.docs.isEmpty) {
+        emit(HomeError("لا توجد أهداف مالية محفوظة."));
+        return 0.0;
+      }
+
+      final goalData = snapshot.docs.first.data();
+      final monthlyIncome = (goalData['monthlyIncome'] ?? 0).toDouble();
+
+      await _updateMotivationalMessage(monthlyIncome);
+      return monthlyIncome;
+    });
+  }
 
   Future<void> fetchHomeData() async {
     emit(HomeLoading());
     try {
-      final userId = userIdOfApp;
-      if (userId == null) {
-        emit(HomeError("المستخدم غير مسجل الدخول"));
-        return;
-      }
+      // Trigger stream update
 
-      // اجلب أحدث وثيقة من goals
-      final goalsSnapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('goals')
-          .orderBy('createdAt', descending: true)
-          .limit(1)
-          .get();
-
-      if (goalsSnapshot.docs.isEmpty) {
-        emit(HomeError("لا توجد أهداف مالية محفوظة."));
-        return;
-      }
-
-      final goalData = goalsSnapshot.docs.first.data();
-      final monthlyIncome = (goalData['monthlyIncome'] ?? 0).toDouble();
-
-      final prompt =
-          '''
-    أعطني رسالة تحفيزية قصيرة لمستخدم يحاول الادخار من دخله الشهري ($monthlyIncome). 
-    استخدم لغة عربية سهلة وودّية.
-    ''';
-
-      final motivation = await _fetchMotivationalMessage(prompt);
-
-      emit(
-        HomeLoaded(
-          monthlyIncome: monthlyIncome,
-          motivationalMessage: motivation,
-        ),
-      );
+   
+      emit(HomeLoaded());
     } catch (e) {
       emit(HomeError("خطأ أثناء تحميل البيانات: $e"));
     }
   }
 
-  Future<String> _fetchMotivationalMessage(String prompt) async {
-    final response = await http.post(
-      Uri.parse('https://api.openai.com/v1/chat/completions'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${ApiKeyConst.apiKey}',
-      },
-      body: jsonEncode({
-        'model': 'gpt-3.5-turbo-0125',
-        'messages': [
-          {
-            'role': 'system',
-            'content':
-                'أنت مساعد مالي ذكي تقدم رسائل تحفيزية قصيرة باللغة العربية لمستخدمي التطبيق الذين يحاولون تحسين ميزانيتهم.',
-          },
-          {'role': 'user', 'content': prompt},
-        ],
-        'temperature': 0.7,
-      }),
-    );
+  Future<void> _updateMotivationalMessage(double monthlyIncome) async {
+    try {
+      final prompt = '''
+      أعطني رسالة تحفيزية قصيرة لمستخدم يحاول الادخار من دخله الشهري ($monthlyIncome ريال).
+      الرسالة يجب أن تكون باللغة العربية الفصحى السهلة،
+      لا تزيد عن جملتين، وركّز على التشجيع على الاستمرار في الادخار.
+      ''';
 
-    print('OpenAI response status: ${response.statusCode}');
-    print('OpenAI response body: ${response.body}');
+      final response = await http.post(
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${ApiKeyConst.apiKey}',
+        },
+        body: jsonEncode({
+          'model': 'gpt-3.5-turbo-0125',
+          'messages': [
+            {
+              'role': 'system',
+              'content': 'أنت مساعد مالي ذكي تقدم نصائح مالية قصيرة باللغة العربية.',
+            },
+            {'role': 'user', 'content': prompt},
+          ],
+          'temperature': 0.7,
+          'max_tokens': 100,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data['choices'][0]['message']['content'];
-    } else {
-      return "أهلاً بك! لا تنسَ أن كل خطوة صغيرة تقربك من أهدافك."; // fallback
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        _motivationalMessage = data['choices'][0]['message']['content'];
+        emit(HomeLoaded());
+      }
+    } catch (e) {
+      _motivationalMessage = "استمر في توفيرك اليومي، فكل ريال يدخر يقربك من أهدافك!";
     }
   }
 }
-// home_state.dart
 
+// home_state.dart
 @immutable
 abstract class HomeState {}
 
@@ -106,12 +114,7 @@ class HomeInitial extends HomeState {}
 
 class HomeLoading extends HomeState {}
 
-class HomeLoaded extends HomeState {
-  final double monthlyIncome;
-  final String motivationalMessage;
-
-  HomeLoaded({required this.monthlyIncome, required this.motivationalMessage});
-}
+class HomeLoaded extends HomeState {}
 
 class HomeError extends HomeState {
   final String message;
@@ -119,7 +122,6 @@ class HomeError extends HomeState {
 }
 
 // home_view.dart
-
 class HomeView extends StatefulWidget {
   final String? userId;
   const HomeView({super.key, this.userId});
@@ -140,132 +142,152 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffFFFEF9),
+      backgroundColor: const Color(0xffFFFEF9),
       body: SafeArea(
-        child: BlocBuilder<HomeCubit, HomeState>(
+        child: BlocConsumer<HomeCubit, HomeState>(
+          listener: (context, state) {
+            if (state is HomeError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          },
           builder: (context, state) {
             if (state is HomeLoading || state is HomeInitial) {
               return const Center(
                 child: CircularProgressIndicator(color: AppColors.brownColor),
               );
-            } else if (state is HomeError) {
-              return Center(child: Text(state.message));
-            } else if (state is HomeLoaded) {
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProfileView(
-                                  userIdOfApp: userIdOfApp!,
-                                ),
-                              ),
-                            );
-                          },
-                          child: SvgPicture.asset(Assets.imagesUser),
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _showBalance = !_showBalance;
-                            });
-                          },
-                          child: SvgPicture.asset(Assets.imagesEye),
-                        ),
-                        const SizedBox(width: 10),
-                        GestureDetector(
-                          onTap: () {
-                            SystemNavigator.pop();
-                          },
-                          child: SvgPicture.asset(Assets.imagesLogout),
-                        ),
-                      ],
-                    ),
-                  ),
+            }
 
-                  Column(
+            return Column(
+              children: [
+                // Header with user controls
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
                     children: [
-                      Stack(
-                        children: [
-                          Image.asset(
-                            width: MediaQuery.sizeOf(context).width * 0.8,
-                            Assets.imagesMessage,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: SizedBox(
-                              width: MediaQuery.sizeOf(context).width * 0.65,
-                              child: Text(
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 4,
-                                state.motivationalMessage,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProfileView(
+                              userIdOfApp: userIdOfApp!,
                             ),
                           ),
-                        ],
+                        ),
+                        child: SvgPicture.asset(Assets.imagesUser),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: SvgPicture.asset(
+                          Assets.imagesEye,
+                          color: _showBalance ? Colors.blue : null,
+                        ),
+                        onPressed: () => setState(() => _showBalance = !_showBalance),
+                      ),
+                      const SizedBox(width: 10),
+                      IconButton(
+                        icon: SvgPicture.asset(Assets.imagesLogout),
+                        onPressed: () => SystemNavigator.pop(),
                       ),
                     ],
                   ),
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 20, left: 100),
-                      child: Image.asset(Assets.imagesSliverHelloCharacter),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Stack(
-                        children: [
-                          Image.asset(Assets.imagesCard),
-                          Positioned(
-                            left: 15,
-                            top: 55,
-                            child: Row(
-                              children: [
-                                Text(
-                                  _showBalance
-                                      ? state.monthlyIncome.toStringAsFixed(2)
-                                      : "*****",
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(width: 15),
-                                SizedBox(
-                                  width: 25,
-                                  height: 25,
-                                  child: SvgPicture.asset(
-                                    Assets.imagesRyal,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                ),
+
+                // Motivational message
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        width: MediaQuery.sizeOf(context).width * 0.8,
+                        Assets.imagesMessage,
                       ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: SizedBox(
+                          width: MediaQuery.sizeOf(context).width * 0.65,
+                          child: Text(
+                            context.read<HomeCubit>().motivationalMessage,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Character image
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 20, left: 100),
+                    child: imagesApp.isEmpty ? SizedBox(): Image.asset(imagesApp[0]  ),
+                  ),
+                ),
+
+                // Monthly income card
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: StreamBuilder<double?>(
+                      stream: context.read<HomeCubit>().monthlyIncomeStream,
+                      builder: (context, snapshot) {
+                        final monthlyIncome = snapshot.data ?? 0.0;
+                        final formattedIncome = monthlyIncome.toStringAsFixed(2);
+
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.asset(
+                              Assets.imagesCard,
+                              width: MediaQuery.sizeOf(context).width * 0.9,
+                              fit: BoxFit.fitWidth,
+                            ),
+                            Positioned(
+                              top: 55,
+                              left: 15,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    _showBalance ? formattedIncome : "•••••",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  SizedBox(
+                                    width: 28,
+                                    height: 28,
+                                    child: SvgPicture.asset(
+                                      Assets.imagesRyal,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                          ],
+                        );
+                      },
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const CustomBottomNavigationBar(pageName: "home"),
-                ],
-              );
-            }
-            return const SizedBox.shrink();
+                ),
+                const SizedBox(height: 20),
+                const CustomBottomNavigationBar(pageName: "home"),
+              ],
+            );
           },
         ),
       ),

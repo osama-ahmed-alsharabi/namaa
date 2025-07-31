@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:namaa/cores/assets.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/features/home/views/home_view.dart';
+import 'package:namaa/main.dart';
 
 class PlanView extends StatefulWidget {
   const PlanView({super.key});
@@ -57,7 +58,7 @@ class _PlanViewState extends State<PlanView> {
                 ),
               ),
             ),
-            Expanded(child: Image.asset(Assets.imagesTest)),
+            Expanded(child: Image.asset(Assets.imagesGHelloCharacter)),
           ],
         ),
       ),

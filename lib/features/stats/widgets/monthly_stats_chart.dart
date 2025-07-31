@@ -3,14 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:namaa/features/stats/view_model/monthly_stats_cubit/monthly_stats_cubit.dart';
 
+// Modern color palette
 const categoryColors = {
-  "ادخار": Color(0xFFD9E67C),
-  "الصحة": Color(0xFFF080B5),
-  "الترفيه": Color(0xFF6F8A56),
-  "طعام": Color(0xFFB39C6A),
+  "ادخار": Color(0xFF4CAF50),  // Green
+  "الصحة": Color(0xFF2196F3),  // Blue
+  "الترفيه": Color(0xFF9C27B0), // Purple
+  "طعام": Color(0xFFFF9800),    // Orange
+  "مواصلات": Color(0xFF607D8B), // Blue Grey
+  "تسوق": Color(0xFFE91E63),    // Pink
+  "فواتير": Color(0xFF795548),  // Brown
 };
-
-const weeks = ['1', '2', '3', '4'];
 
 class MonthlyStatsChart extends StatelessWidget {
   final String userIdOfApp;
@@ -23,101 +25,219 @@ class MonthlyStatsChart extends StatelessWidget {
       child: BlocBuilder<MonthlyStatsCubit, MonthlyStatsState>(
         builder: (context, state) {
           if (state is MonthlyStatsLoading || state is MonthlyStatsInitial) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFBDA876)),
+              ),
+            );
           } else if (state is MonthlyStatsError) {
-            return Center(child: Text(state.message));
+            return Center(
+              child: Text(
+                state.message,
+                style: TextStyle(color: Color(0xFFD32F2F)),
+              ),
+            );
           } else if (state is MonthlyStatsLoaded) {
-            // كل الفئات المستخدمة فعليًا في الشهر
+            // Extract all categories used during the month
             final allCategories = <String>{};
             for (final map in state.monthData.values) {
               allCategories.addAll(map.keys);
             }
             final categories = allCategories.toList();
 
-            return Column(
-              children: [
-                const SizedBox(height: 16),
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
+            return Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Header with month
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Color(0xFFBDA876),
-                      borderRadius: BorderRadius.circular(10),
+                      color: Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      "${_arabicMonth(DateTime.now().month)} ${DateTime.now().year}",
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.calendar_month, size: 18, color: Color(0xFF25386A)),
+                        SizedBox(width: 8),
+                        Text(
+                          "إحصائيات شهر ${_arabicMonth(DateTime.now().month)} ${DateTime.now().year}",
+                          style: TextStyle(
+                            color: Color(0xFF25386A),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                AspectRatio(
-                  aspectRatio: 1.6,
-                  child: BarChart(
-                    BarChartData(
-                      barGroups: List.generate(4, (weekIdx) {
-                        final weekData = state.monthData[weekIdx + 1] ?? {};
-                        return BarChartGroupData(
-                          x: weekIdx,
-                          barRods: categories.map((cat) {
-                            final y = weekData[cat] ?? 0.0;
-                            final color = categoryColors[cat] ?? Colors.grey;
-                            return BarChartRodData(
-                              toY: y,
-                              color: color,
-                              width: 18,
-                              borderRadius: BorderRadius.circular(2),
-                            );
-                          }).toList(),
-                        );
-                      }),
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: true, reservedSize: 36),
+                  SizedBox(height: 24),
+                  
+                  // Chart
+                  AspectRatio(
+                    aspectRatio: 1.6,
+                    child: BarChart(
+                      BarChartData(
+                        barGroups: List.generate(4, (weekIdx) {
+                          final weekData = state.monthData[weekIdx + 1] ?? {};
+                          return BarChartGroupData(
+                            x: weekIdx,
+                            barsSpace: 4,
+                            barRods: categories.map((cat) {
+                              final y = weekData[cat] ?? 0.0;
+                              final color = categoryColors[cat] ?? _generateColor(cat);
+                              return BarChartRodData(
+                                toY: y,
+                                color: color,
+                                width: 22,
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
+                                backDrawRodData: BackgroundBarChartRodData(
+                                  show: true,
+                                  color: Colors.grey[200],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        }),
+                        titlesData: FlTitlesData(
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 40,
+                              getTitlesWidget: (value, meta) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Text(
+                                    value.toInt().toString(),
+                                    style: TextStyle(
+                                      color: Color(0xFF616161),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) {
+                                int idx = value.toInt();
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    "أسبوع ${idx + 1}",
+                                    style: TextStyle(
+                                      color: Color(0xFF25386A),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              },
+                              reservedSize: 32,
+                            ),
+                          ),
+                          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                         ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (value, meta) {
-                              int idx = value.toInt();
-                              return Text(
-                                idx >= 0 && idx < weeks.length ? weeks[idx] : '',
-                                style: const TextStyle(fontSize: 13),
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          horizontalInterval: 1,
+                          getDrawingHorizontalLine: (value) => FlLine(
+                            color: Colors.grey.withOpacity(0.1),
+                            strokeWidth: 1,
+                          ),
+                        ),
+                        borderData: FlBorderData(
+                          show: true,
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey.withOpacity(0.2),
+                              width: 1,
+                            ),
+                            left: BorderSide(
+                              color: Colors.grey.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        barTouchData: BarTouchData(
+                          enabled: true,
+                          touchTooltipData: BarTouchTooltipData(
+                            // tooltipBgColor: Colors.white,
+                            tooltipPadding: EdgeInsets.all(8),
+                            tooltipMargin: 8,
+                            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                              final category = categories[rodIndex];
+                              final amount = rod.toY;
+                              return BarTooltipItem(
+                                '$category\n${amount.toStringAsFixed(2)} ريال',
+                                TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               );
                             },
                           ),
                         ),
-                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                       ),
-                      gridData: FlGridData(show: true),
-                      borderData: FlBorderData(show: false),
-                      barTouchData: BarTouchData(enabled: true),
                     ),
                   ),
-                ),
-                const SizedBox(height: 18),
-                // Legend
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: categories.map((cat) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            color: categoryColors[cat] ?? Colors.grey,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(cat, style: const TextStyle(fontSize: 14)),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
+                  SizedBox(height: 24),
+                  
+                  // Legend
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: categories.map((cat) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: categoryColors[cat] ?? _generateColor(cat),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              cat,
+                              style: TextStyle(
+                                color: Color(0xFF424242),
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
             );
           }
           return const SizedBox.shrink();
@@ -132,5 +252,11 @@ class MonthlyStatsChart extends StatelessWidget {
       "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
     ];
     return months[month];
+  }
+
+  Color _generateColor(String category) {
+    // Generate a consistent color based on category name
+    final hash = category.hashCode;
+    return Color(hash & 0xFFFFFF).withOpacity(1.0).withBlue(150);
   }
 }

@@ -1,18 +1,16 @@
-// weekly_stats_state.dart
-part of 'weekly_stats_cubit.dart';
-
-@immutable
 abstract class WeeklyStatsState {}
 
-class WeeklyStatsInitial extends WeeklyStatsState {}
-class WeeklyStatsLoading extends WeeklyStatsState {}
+final class WeeklyStatsInitial extends WeeklyStatsState {}
 
-class WeeklyStatsLoaded extends WeeklyStatsState {
-  final Map<int, Map<String, double>> weekData;
+final class WeeklyStatsLoading extends WeeklyStatsState {}
+
+final class WeeklyStatsLoaded extends WeeklyStatsState {
+  Map<int, Map<String, double>> weekData;
   WeeklyStatsLoaded({required this.weekData});
 }
 
-class WeeklyStatsError extends WeeklyStatsState {
-  final String message;
-  WeeklyStatsError(this.message);
+final class WeeklyStatsError extends WeeklyStatsState {
+  final String errorMessage;
+
+  WeeklyStatsError(this.errorMessage);
 }

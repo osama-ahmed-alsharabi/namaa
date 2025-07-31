@@ -26,6 +26,10 @@ class LoginCubit extends Cubit<LoginState> {
       }
 
       final userDoc = querySnapshot.docs.first;
+      userIdOfApp = userDoc.id;
+      final userId = userDoc.id;
+      imagesApp = await getCharacterImages();
+
       // final userData = userDoc.data();
 
       // تحقق من كلمة المرور
@@ -33,11 +37,47 @@ class LoginCubit extends Cubit<LoginState> {
       //   emit(LoginFailure('كلمة المرور غير صحيحة'));
       //   return;
       // }
-      userIdOfApp = userDoc.id;
-      final userId = userDoc.id;
+
       emit(LoginSuccess(userId: userId));
     } catch (e) {
       emit(LoginFailure('حدث خطأ: $e'));
+    }
+  }
+
+  Future<int> getUserPoints(String userId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      return (doc.data()?['points'] as num? ?? 0).toInt();
+    } catch (e) {
+      print('Error getting user points: $e');
+      return 0; // Return default value if error occurs
+    }
+  }
+
+  Future<List<String>> getCharacterImages() async {
+    final points = await getUserPoints(
+      userIdOfApp!,
+    ); // Assuming userIdOfApp is available
+
+    if (points < 100) {
+      return [
+        'assets/images/b_hello_character.PNG',
+        'assets/images/b_small_character.PNG',
+      ];
+    } else if (points < 250) {
+      return [
+        'assets/images/s_hello_character.PNG',
+        'assets/images/s_small_character.PNG',
+      ];
+    } else {
+      return [
+        'assets/images/g_hello_character.png',
+        'assets/images/g_small_character.png',
+      ];
     }
   }
 }

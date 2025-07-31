@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:namaa/cores/assets.dart';
 import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/features/chat/view_model/cubit/chat_cubit.dart';
+import 'package:namaa/main.dart';
 
 class ChatScreen extends StatelessWidget {
   final TextEditingController _messageController = TextEditingController();
@@ -17,7 +18,7 @@ class ChatScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         toolbarHeight: 70,
         title: const Text("درهم..."),
-        leading: Image.asset(Assets.imagesSleverSmallCharacter),
+        leading: Image.asset(imagesApp[1]),
         actions: [
           Directionality(
             textDirection: TextDirection.ltr,
@@ -67,15 +68,17 @@ class ChatScreen extends StatelessWidget {
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 3 ,vertical: 15),
                   child: Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _messageController,
-                          decoration: const InputDecoration(
+                          decoration:  InputDecoration(
                             hintText: "أرسل الرسالة ",
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25)
+                            ),
                           ),
                         ),
                       ),
@@ -86,7 +89,7 @@ class ChatScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.send),
+                          icon: const Icon(Icons.send ,),
                           onPressed: () {
                             final message = _messageController.text.trim();
                             if (message.isNotEmpty) {

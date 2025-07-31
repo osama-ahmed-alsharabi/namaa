@@ -12,12 +12,10 @@ class SignupCubit extends Cubit<SignupState> {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
 
-  SignupCubit({
-    FirebaseAuth? auth,
-    FirebaseFirestore? firestore,
-  })  : _auth = auth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance,
-        super(const SignupState.initial());
+  SignupCubit({FirebaseAuth? auth, FirebaseFirestore? firestore})
+    : _auth = auth ?? FirebaseAuth.instance,
+      _firestore = firestore ?? FirebaseFirestore.instance,
+      super(const SignupState.initial());
 
   Future<void> signUpWithPhone({
     required String phoneNumber,
@@ -47,8 +45,8 @@ class SignupCubit extends Cubit<SignupState> {
 
     try {
       // Format phone number (assuming Saudi numbers)
-      final formattedPhone = phoneNumber.startsWith('+966') 
-          ? phoneNumber 
+      final formattedPhone = phoneNumber.startsWith('+966')
+          ? phoneNumber
           : '+966${phoneNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
 
       // Send verification code
@@ -63,14 +61,16 @@ class SignupCubit extends Cubit<SignupState> {
           emit(SignupState.error(e.message ?? 'Verification failed'));
         },
         codeSent: (String verificationId, int? resendToken) {
-          emit(SignupState.codeSent(
-            verificationId: verificationId,
-            phoneNumber: formattedPhone,
-            name: name,
-            age: age,
-            gender: gender,
-            password: password,
-          ));
+          emit(
+            SignupState.codeSent(
+              verificationId: verificationId,
+              phoneNumber: formattedPhone,
+              name: name,
+              age: age,
+              gender: gender,
+              password: password,
+            ),
+          );
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           // Handle timeout if needed
@@ -113,7 +113,7 @@ class SignupCubit extends Cubit<SignupState> {
   ) async {
     try {
       final user = _auth.currentUser;
-       userIdOfApp = _auth.currentUser!.uid;
+      userIdOfApp = _auth.currentUser!.uid;
       if (user == null) {
         emit(const SignupState.error('User not found'));
         return;
@@ -130,10 +130,47 @@ class SignupCubit extends Cubit<SignupState> {
         'phone': user.phoneNumber,
         'createdAt': FieldValue.serverTimestamp(),
       });
-
+      imagesApp = await getCharacterImages();
       emit(const SignupState.success());
     } catch (e) {
       emit(SignupState.error(e.toString()));
+    }
+  }
+
+  Future<int> getUserPoints(String userId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      return (doc.data()?['points'] as num? ?? 0).toInt();
+    } catch (e) {
+      print('Error getting user points: $e');
+      return 0; // Return default value if error occurs
+    }
+  }
+
+  Future<List<String>> getCharacterImages() async {
+    final points = await getUserPoints(
+      userIdOfApp!,
+    ); // Assuming userIdOfApp is available
+
+    if (points < 100) {
+      return [
+        'assets/images/b_hello_character.PNG',
+        'assets/images/b_small_character.PNG',
+      ];
+    } else if (points < 200) {
+      return [
+        'assets/images/s_hello_character.PNG',
+        'assets/images/s_small_character.PNG',
+      ];
+    } else {
+      return [
+        'assets/images/g_hello_character.png',
+        'assets/images/g_small_character.png',
+      ];
     }
   }
 }

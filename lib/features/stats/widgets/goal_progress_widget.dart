@@ -5,6 +5,7 @@ import 'package:namaa/features/stats/view_model/goal_monthly_cubit/goal_stats_st
 
 class GoalMonthlyWidget extends StatelessWidget {
   final String userIdOfApp;
+  
   const GoalMonthlyWidget({super.key, required this.userIdOfApp});
 
   @override
@@ -33,27 +34,29 @@ class GoalMonthlyWidget extends StatelessWidget {
                         const Icon(Icons.track_changes, color: Color(0xFF25386A), size: 28),
                         const SizedBox(width: 8),
                         Text(
-                          "الهدف ${state.monthlyIncome.toStringAsFixed(0)} ريال",
+                          "الهدف ${state.monthlySavingsGoal.toStringAsFixed(0)} ريال",
                           style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 22, color: Color(0xFF25386A)),
-                        ),
+                            fontWeight: FontWeight.bold, 
+                            fontSize: 22, 
+                            color: Color(0xFF25386A),
+                         ) ),
                       ],
                     ),
                     const SizedBox(height: 22),
                     // المبلغ المحقق (ادخار)
                     _buildProgressRow(
-                      percent: (state.totalSaved / state.monthlyIncome * 100).clamp(0, 100),
+                      percent: (state.totalSavedFromDaily / state.monthlySavingsGoal * 100).clamp(0, 100),
                       color: const Color(0xFFD5F790),
                       label: "المبلغ المدخر: ",
-                      value: state.totalSaved,
+                      value: state.totalSavedFromDaily,
                     ),
                     const SizedBox(height: 12),
                     // المبلغ المتبقي
                     _buildProgressRow(
-                      percent: (state.remaining / state.monthlyIncome * 100).clamp(0, 100),
+                      percent: (state.remaining / state.monthlySavingsGoal * 100).clamp(0, 100),
                       color: const Color(0xFFF6A04B),
                       label: "المبلغ المتبقي: ",
-                      value: state.remaining.toDouble(),
+                      value: state.remaining,
                     ),
                     const SizedBox(height: 12),
                     // نسبة الإنجاز

@@ -318,7 +318,7 @@ class _SingupFormWidgetState extends State<SingupFormWidget> {
                                       phoneNumber: _phoneController.text,
                                       name: _nameController.text,
                                       age: _ageController.text,
-                                      gender: _genderController.text,
+                                      gender:selectedGender ?? "ذكر",
                                       password: _passwordController.text,
                                       confirmPassword:
                                           _confirmPasswordController.text,

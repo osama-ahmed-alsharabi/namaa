@@ -1,4 +1,3 @@
-// yearly_stats_cubit.dart
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
@@ -18,27 +17,30 @@ class YearlyStatsCubit extends Cubit<YearlyStatsState> {
       final startOfYear = DateTime(now.year, 1, 1);
       final endOfYear = DateTime(now.year, 12, 31, 23, 59, 59);
 
-      final budgetSnap = await _firestore
+      final dailyResultsSnap = await _firestore
           .collection('users')
           .doc(userIdOfApp)
-          .collection('monthly_budget')
-          .where('createdAt', isGreaterThanOrEqualTo: startOfYear)
-          .where('createdAt', isLessThanOrEqualTo: endOfYear)
+          .collection('daily_results')
+          .where('date', isGreaterThanOrEqualTo: startOfYear)
+          .where('date', isLessThanOrEqualTo: endOfYear)
           .get();
 
-      // مصفوفة [12][فئة] لكل شهر
+      // Array [12][category] for each month
       Map<int, Map<String, double>> yearData = {};
       for (int m = 1; m <= 12; m++) {
         yearData[m] = {};
       }
 
-      for (var doc in budgetSnap.docs) {
+      for (var doc in dailyResultsSnap.docs) {
         final data = doc.data();
-        final category = data['category'] ?? 'غير مصنّف';
-        final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
-        final createdAt = (data['createdAt'] as Timestamp).toDate();
-        final month = createdAt.month;
-        yearData[month]![category] = (yearData[month]![category] ?? 0) + amount;
+        final answers = data['answers'] as Map<String, dynamic>? ?? {};
+        final date = (data['date'] as Timestamp).toDate();
+        final month = date.month;
+        
+        answers.forEach((category, value) {
+          double amount = (value as num).toDouble();
+          yearData[month]![category] = (yearData[month]![category] ?? 0) + amount;
+        });
       }
 
       emit(YearlyStatsLoaded(yearData: yearData));

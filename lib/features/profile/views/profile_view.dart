@@ -71,7 +71,7 @@ class _ProfileViewState extends State<ProfileView> {
         backgroundColor: const Color(0xffFFFEF9),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_forward_ios, color: Colors.black),
+          icon: Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
       ),

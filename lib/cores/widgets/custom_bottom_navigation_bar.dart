@@ -4,6 +4,7 @@ import 'package:namaa/cores/utils/app_colors.dart';
 import 'package:namaa/features/chat/views/chat_screen.dart';
 import 'package:namaa/features/settings/views/settings_view.dart';
 import 'package:namaa/features/stats/stats_view.dart';
+import 'package:namaa/features/ticker/ticker_view.dart';
 import 'package:namaa/main.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -24,11 +25,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-               if (pageName == 'settings') {
+              if (pageName == 'settings') {
                 Navigator.pop(context);
               }
             },
-            child: Image.asset(Assets.imagesHome),
+            child: Icon(Icons.home , size: 35, color: Colors.black54,),
           ),
           GestureDetector(
             onTap: () {
@@ -39,7 +40,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 ),
               );
             },
-            child: Image.asset(Assets.imagesStatistic),
+            child: Icon(Icons.stacked_bar_chart , size: 35, color: Colors.black54,),
           ),
           GestureDetector(
             onTap: () {
@@ -48,9 +49,19 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => ChatScreen()),
               );
             },
-            child: Image.asset(Assets.imagesSleverSmallCharacter),
+            child: imagesApp.isEmpty ? SizedBox(): Image.asset(imagesApp[1] , height: 100,),
           ),
-          Image.asset(Assets.imagesReceipt),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GameView(),
+                ),
+              );
+            },
+            child: Icon(Icons.question_answer_outlined , size: 35, color: Colors.black54,),
+          ),
           GestureDetector(
             onTap: () {
               if (pageName != "settings") {
@@ -60,7 +71,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 );
               }
             },
-            child: Image.asset(Assets.imagesSettings),
+            child: Icon(Icons.settings , size: 35, color: Colors.black54,),
           ),
         ],
       ),
